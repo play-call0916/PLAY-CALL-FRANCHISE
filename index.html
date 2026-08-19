@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07101c">
-<title>PLAY CALL - FRANCHISE MODE Ver.0.5.1</title>
+<title>PLAY CALL - FRANCHISE MODE Ver.0.5.2</title>
 <style>
 :root{--panel:#0f1a29;--line:#2a3e56;--text:#f5f7fb;--muted:#9fb0c4;--gold:#d9ad4f;--green:#63d18f;--red:#ef7070}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -12%,#25456d 0,transparent 35%),linear-gradient(#08111f,#050a12);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI","Noto Sans JP",sans-serif;min-height:100vh}
@@ -42,11 +42,11 @@
 </style>
 </head>
 <body>
-<div class=app><div class=hero><div class=brand>PLAY CALL SERIES</div><h1>FRANCHISE <span>MODE</span></h1><div class=sub>Prototype Ver.0.5.1 — ONLINE MULTIPLAYER</div></div><div id=game></div></div>
+<div class=app><div class=hero><div class=brand>PLAY CALL SERIES</div><h1>FRANCHISE <span>MODE</span></h1><div class=sub>Prototype Ver.0.5.2 — ONLINE MULTIPLAYER</div></div><div id=game></div></div>
 <div class=bottom><div class=bottomin><button onclick=openLeague()>🏈 ROSTERS</button><button onclick=openHistory()>📜 DRAFT</button><button onclick=openResults()>🏆 RESULTS</button><button onclick=openFA()>🧾 FA</button><button onclick=resetGame()>↻ RESET</button></div></div>
 <div id=modal class=modal onclick="if(event.target===this)this.classList.remove('show')"><div class=sheet><div id=modalbody></div><button class=ghost style="width:100%;margin-top:10px" onclick="document.getElementById('modal').classList.remove('show')">閉じる</button></div></div>
 <script>
-const VERSION="0.5.1",KEY="pc_franchise_v0510";
+const VERSION="0.5.2",KEY="pc_franchise_v0520";
 const BASE_CAPS={1:100,2:115,3:125},NEED={HC:1,QB:1,OF:3,DF:3},POS=["HC","QB","OF","DF"];
 const COUNTS={QB:{S:3,A:9,B:10,C:8},HC:{S:3,A:9,B:10,C:8},OF:{S:9,A:27,B:30,C:24},DF:{S:9,A:27,B:30,C:24}};
 const RANGE={S:[90,99],A:[80,89],B:[70,79],C:[60,69]},RSAL={S:20,A:15,B:5,C:1},TYPES=[["王道",70],["晩成",15],["即戦力",10],["一発屋",5]];
@@ -166,14 +166,21 @@ async function startSeason1Draft(){
   if(ONLINE_TRANSITION)return;
   if(!isOnline()){beginDraft(1);save();render();topNow();return}
   ONLINE_TRANSITION=true;
-  const before=JSON.parse(JSON.stringify(S));
   try{
     beginDraft(1);
-    await pushOnlineStateNow("draft");
+    // IMPORTANT: reserve a newer revision BEFORE waiting for any older queued write.
+    // This prevents a late LOTTERY snapshot from rewinding the HOST back from DRAFT.
+    S.room.syncRev=(S.room.syncRev||0)+1;
+    S.room.syncAt=Date.now();
+    saveLocal();
     render();topNow();
+    await pushOnlineSnapshotNow(JSON.parse(JSON.stringify(S)),"draft");
   }catch(e){
-    S=before;saveLocal();NET.connected=false;NET.lastError=e.message;render();
-    alert(`ドラフト開始の同期に失敗しました。\n${e.message}`);
+    NET.lastError=e.message;
+    renderNetBarOnly();
+    alert(`ドラフト画面には進みましたが、Firebase同期を再試行しています。\n${e.message}`);
+    // Do not rewind the local draft. The normal queue/polling path will retry on the next action.
+    queueRemoteState();
   }finally{ONLINE_TRANSITION=false}
 }
 
@@ -369,7 +376,7 @@ function cur(){return S.players.find(p=>p.id===S.draft.order[S.draft.turn])}func
 function draftedPosCount(p,pos){return S.draftHistory.filter(x=>x.season===S.room.season&&x.playerId===p.id&&x.pos===pos).length}
 function season1PosFull(p,pos){return S.room.season===1&&draftedPosCount(p,pos)>=NEED[pos]}
 function moveUndraftedMarketToFA(){for(const pos of POS){for(const uid of S.market[pos]||[]){let c=card(uid);if(c&&c.status==="free")addFA(c,S.room.season)}S.market[pos]=[]}}
-function setView(pos){if(eligiblePos(S.room.season).includes(pos)){S.viewPos=pos;save();render()}}function setRPos(pos){S.rosterPos=pos;save();render()}
+function setView(pos){if(eligiblePos(S.room.season).includes(pos)){S.viewPos=pos;if(isOnline())saveLocal();else save();render()}}function setRPos(pos){S.rosterPos=pos;if(isOnline())saveLocal();else save();render()}
 function addHistory(p,c){let hs=S.draftHistory.filter(x=>x.season===S.room.season),overall=hs.length+1,round=Math.floor((overall-1)/S.players.length)+1,pickInRound=((overall-1)%S.players.length)+1;S.draftHistory.push({season:S.room.season,round,pickInRound,overall,playerId:p.id,playerName:p.name,uid:c.uid,pos:c.pos,rank:c.rank,power:st(c).power,salary:st(c).salary})}
 function pick(uid){let p=cur(),c=card(uid);if(!p||!c||c.status!=="free"||picksLeft(p)<=0)return;if(season1PosFull(p,c.pos))return alert(`${c.pos}枠はすでに埋まっています。`);c.owner=p.id;c.status="owned";c.draftSeason=S.room.season;p.owned.push(uid);S.draft.pickedTotal[p.id]++;S.market[c.pos]=S.market[c.pos].filter(x=>x!==uid);addHistory(p,c);if(allDone()){moveUndraftedMarketToFA();beginBuild();save();render();topNow();return}do{S.draft.turn=(S.draft.turn+1)%S.players.length}while(done(cur()));save();render();topNow()}
 function beginBuild(){S.room.phase="build";S.rosterPlayer=0;S.rosterPos="HC";S.players.forEach(p=>{p.active=p.active.filter(id=>p.owned.includes(id));p.practice=p.practice.filter(id=>p.owned.includes(id))})}
@@ -825,32 +832,32 @@ async function dbPut(path,data){let r=await fetch(dbEndpoint(path),{method:"PUT"
 async function dbPatch(path,data){let r=await fetch(dbEndpoint(path),{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});if(!r.ok)throw new Error(`DB PATCH ${r.status}`);return r.json()}
 async function dbDelete(path){let r=await fetch(dbEndpoint(path),{method:"DELETE"});if(!r.ok)throw new Error(`DB DELETE ${r.status}`);return true}
 let ONLINE_TRANSITION=false;
-async function pushOnlineStateNow(phase){
+function wait(ms){return new Promise(r=>setTimeout(r,ms))}
+async function dbWriteRetry(fn,tries=3){let last;for(let i=0;i<tries;i++){try{return await fn()}catch(e){last=e;if(i<tries-1)await wait(350*(i+1))}}throw last}
+async function pushOnlineSnapshotNow(snapshot,phase){
   if(!isOnline()||!dbReady())return;
+  // Older queued writes may finish first, but this snapshot already owns the newer syncRev.
   await REMOTE_QUEUE.catch(()=>{});
-  S.room.syncRev=(S.room.syncRev||0)+1;
-  S.room.syncAt=Date.now();
-  saveLocal();
-  const snapshot=JSON.parse(JSON.stringify(S));
-  await dbPut(`rooms/${NET.roomCode}/state`,snapshot);
-  await dbPatch(`rooms/${NET.roomCode}/meta`,{updatedAt:Date.now(),version:VERSION,phase:phase||S.room.phase});
-  NET.connected=true;NET.lastError="";
+  await dbWriteRetry(()=>dbPut(`rooms/${NET.roomCode}/state`,snapshot));
+  // meta is diagnostic only; a meta failure must never undo a successful state transition.
+  try{await dbWriteRetry(()=>dbPatch(`rooms/${NET.roomCode}/meta`,{updatedAt:Date.now(),version:VERSION,phase:phase||snapshot.room?.phase}),2)}catch(e){console.warn("meta sync",e)}
+  NET.connected=true;NET.lastError="";renderNetBarOnly();
 }
-function queueRemoteState(){if(!NET.roomCode||!dbReady())return;let snapshot=JSON.parse(JSON.stringify(S)),room=NET.roomCode;REMOTE_QUEUE=REMOTE_QUEUE.then(async()=>{try{await dbPut(`rooms/${room}/state`,snapshot);await dbPatch(`rooms/${room}/meta`,{updatedAt:Date.now()});NET.connected=true;NET.lastError=""}catch(e){NET.connected=false;NET.lastError=e.message;console.error(e);renderNetBarOnly()}});return REMOTE_QUEUE}
+function queueRemoteState(){if(!NET.roomCode||!dbReady())return;let snapshot=JSON.parse(JSON.stringify(S)),room=NET.roomCode;REMOTE_QUEUE=REMOTE_QUEUE.then(async()=>{try{await dbWriteRetry(()=>dbPut(`rooms/${room}/state`,snapshot),2);try{await dbPatch(`rooms/${room}/meta`,{updatedAt:Date.now()})}catch(_){}NET.connected=true;NET.lastError=""}catch(e){NET.lastError=e.message;console.error(e);renderNetBarOnly()}});return REMOTE_QUEUE}
 function renderNetBarOnly(){let el=document.getElementById("netbar");if(el)el.outerHTML=networkBar()}
 function closeStreams(){try{STATE_STREAM?.close()}catch(e){}try{MEMBER_STREAM?.close()}catch(e){}STATE_STREAM=null;MEMBER_STREAM=null;if(POLL_TIMER){clearInterval(POLL_TIMER);POLL_TIMER=null}}
 function clearOnlineSession(keepDb=true){closeStreams();let db=NET.dbUrl,dev=NET.deviceId;NET={dbUrl:keepDb?db:"",roomCode:"",deviceId:dev||deviceCode(),localPlayerId:null,isHost:false,connected:false,members:{},lastError:""};netSave()}
-function applyRemoteState(data){if(!data||typeof data!=="object")return;let rr=data.room?.syncRev||0,lr=S?.room?.syncRev||0;if(S?.room?.mode==="online"&&S.room.id===data.room?.id&&rr<lr)return;APPLYING_REMOTE=true;S=data;saveLocal();APPLYING_REMOTE=false;NET.connected=true;render()}
+function applyRemoteState(data){if(!data||typeof data!=="object")return;let rr=data.room?.syncRev||0,lr=S?.room?.syncRev||0;if(S?.room?.mode==="online"&&S.room.id===data.room?.id&&rr<=lr)return;APPLYING_REMOTE=true;S=data;saveLocal();APPLYING_REMOTE=false;NET.connected=true;NET.lastError="";render()}
 async function refreshMembers(){if(!NET.roomCode)return;try{NET.members=await dbGet(`rooms/${NET.roomCode}/members`)||{};NET.connected=true;render()}catch(e){NET.connected=false;NET.lastError=e.message;renderNetBarOnly()}}
 async function refreshRemoteSnapshots(){if(!NET.roomCode||!dbReady())return;try{let room=await dbGet(`rooms/${NET.roomCode}`);if(!room){if(!NET.isHost){clearOnlineSession();S=fresh();saveLocal();render();alert("オンラインROOMが終了しました。")}return}NET.members=room.members||{};NET.connected=true;if(room.state)applyRemoteState(room.state)}catch(e){NET.connected=false;NET.lastError=e.message;renderNetBarOnly()}}
 function streamStateEvent(ev){try{let x=JSON.parse(ev.data);if(x.path==="/"&&x.data===null){if(!NET.isHost){clearOnlineSession();S=fresh();saveLocal();render();alert("オンラインROOMが終了しました。")}return}if(x.path==="/"&&x.data)applyRemoteState(x.data);else refreshRemoteSnapshots()}catch(e){console.warn(e)}}
-function startStreams(){closeStreams();if(!NET.roomCode||!dbReady())return;try{STATE_STREAM=new EventSource(dbEndpoint(`rooms/${NET.roomCode}/state`));STATE_STREAM.addEventListener("put",streamStateEvent);STATE_STREAM.addEventListener("patch",streamStateEvent);STATE_STREAM.onopen=()=>{NET.connected=true;NET.lastError="";renderNetBarOnly()};STATE_STREAM.onerror=()=>{NET.connected=false;renderNetBarOnly()};MEMBER_STREAM=new EventSource(dbEndpoint(`rooms/${NET.roomCode}/members`));let mem=()=>refreshMembers();MEMBER_STREAM.addEventListener("put",mem);MEMBER_STREAM.addEventListener("patch",mem)}catch(e){console.warn("SSE unavailable, polling remains active",e)}POLL_TIMER=setInterval(refreshRemoteSnapshots,5000)}
+function startStreams(){closeStreams();if(!NET.roomCode||!dbReady())return;try{STATE_STREAM=new EventSource(dbEndpoint(`rooms/${NET.roomCode}/state`));STATE_STREAM.addEventListener("put",streamStateEvent);STATE_STREAM.addEventListener("patch",streamStateEvent);STATE_STREAM.onopen=()=>{NET.connected=true;NET.lastError="";renderNetBarOnly()};STATE_STREAM.onerror=()=>{NET.lastError="LIVE STREAM unavailable — polling";renderNetBarOnly()};MEMBER_STREAM=new EventSource(dbEndpoint(`rooms/${NET.roomCode}/members`));let mem=()=>refreshMembers();MEMBER_STREAM.addEventListener("put",mem);MEMBER_STREAM.addEventListener("patch",mem)}catch(e){console.warn("SSE unavailable, polling remains active",e)}POLL_TIMER=setInterval(refreshRemoteSnapshots,1200)}
 async function resumeOnline(){if(!NET.roomCode||!dbReady())return;try{let room=await dbGet(`rooms/${NET.roomCode}`);if(!room){clearOnlineSession();return}NET.members=room.members||{};let mine=NET.members[NET.deviceId];if(mine)NET.localPlayerId=mine.playerId??null;NET.connected=true;if(room.state){APPLYING_REMOTE=true;S=room.state;saveLocal();APPLYING_REMOTE=false}startStreams();render()}catch(e){NET.connected=false;NET.lastError=e.message;render()}}
 function networkBar(){if(!isOnline())return"";let me=localTeam(),role=NET.isHost?'<span class=hostTag>HOST</span>':"";return`<div id=netbar class=netbar><span class="netdot ${NET.connected?"on":""}"></span><div><span class=netroom>ROOM ${esc(NET.roomCode)}</span> ${role}<div class=type>${NET.connected?"SYNC CONNECTED":"RECONNECTING / POLLING"}</div></div><div class=netme>${me?`YOU: ${esc(me.name)}`:"TEAM未選択"}</div></div>`}
-function homeScreen(){return`<div class=panel><div class=stage>PLAY CALL SERIES</div><div class=title>FRANCHISE MODE</div><div class=desc>Ver.0.5.1では従来のLOCAL PLAYに加え、友達とそれぞれの端末から同じFranchiseへ参加できます。</div><div class=homeGrid><button class=homeChoice onclick=startLocalSetup()><b>📱 LOCAL PLAY</b><span>従来どおり1端末でHUMAN / CPUを進行。</span></button><button class=homeChoice onclick=openOnlineHub()><b>🌐 ONLINE PLAY</b><span>ROOM CODEで接続。各HUMANが自分の端末から操作。</span></button></div></div>`}
+function homeScreen(){return`<div class=panel><div class=stage>PLAY CALL SERIES</div><div class=title>FRANCHISE MODE</div><div class=desc>Ver.0.5.2では従来のLOCAL PLAYに加え、友達とそれぞれの端末から同じFranchiseへ参加できます。</div><div class=homeGrid><button class=homeChoice onclick=startLocalSetup()><b>📱 LOCAL PLAY</b><span>従来どおり1端末でHUMAN / CPUを進行。</span></button><button class=homeChoice onclick=openOnlineHub()><b>🌐 ONLINE PLAY</b><span>ROOM CODEで接続。各HUMANが自分の端末から操作。</span></button></div></div>`}
 function startLocalSetup(){clearOnlineSession();S=fresh();S.room.mode="local";S.room.phase="setup";saveLocal();render();topNow()}
 function openOnlineHub(){clearOnlineSession();S=fresh();S.room.mode="local";S.room.phase="online_hub";saveLocal();render();topNow()}
-function onlineHubScreen(){NET.dbUrl=DEFAULT_DB_URL;netSave();return`<div class=panel><div class=stage>ONLINE MULTIPLAYER</div><div class=title>CONNECT</div><div class="notice success">ONLINE DATABASE READY<br><span class=type>接続先はVer.0.5.1に組み込み済みです。友達にはこのゲームURLとROOM CODEだけ共有してください。</span></div><button class=big onclick=goOnlineCreate()>CREATE ROOM</button><div style="height:8px"></div><div class=copyRow><input id=joincode maxlength=8 placeholder="ROOM CODE"><button class=ghost onclick=joinOnlineRoom()>JOIN</button></div><button class=ghost style="width:100%;margin-top:9px" onclick=goHome()>← HOME</button><div class=onlineHelp>商用向けのログイン・戦績保存・強固な不正対策はVer.0.5.1では未実装です。Firebase側のDatabase Rules設定が必要です。</div></div>`}
+function onlineHubScreen(){NET.dbUrl=DEFAULT_DB_URL;netSave();return`<div class=panel><div class=stage>ONLINE MULTIPLAYER</div><div class=title>CONNECT</div><div class="notice success">ONLINE DATABASE READY<br><span class=type>接続先はVer.0.5.2に組み込み済みです。友達にはこのゲームURLとROOM CODEだけ共有してください。</span></div><button class=big onclick=goOnlineCreate()>CREATE ROOM</button><div style="height:8px"></div><div class=copyRow><input id=joincode maxlength=8 placeholder="ROOM CODE"><button class=ghost onclick=joinOnlineRoom()>JOIN</button></div><button class=ghost style="width:100%;margin-top:9px" onclick=goHome()>← HOME</button><div class=onlineHelp>商用向けのログイン・戦績保存・強固な不正対策はVer.0.5.2では未実装です。Firebase側のDatabase Rules設定が必要です。</div></div>`}
 function readDbUrl(){let v=normalizeDbUrl(DEFAULT_DB_URL);NET.dbUrl=v;netSave();return v}
 function goOnlineCreate(){if(!readDbUrl())return;S=fresh();S.room.mode="online";S.room.phase="online_setup";saveLocal();render();setTimeout(onlineInputs,0);topNow()}
 function onlineSetupScreen(){return`<div class=panel><div class=stage>ONLINE — NEW FRANCHISE</div><div class=title>ROOM SETUP</div><p class=desc>4〜8チーム。ONLINEではHUMANを2人以上に設定してください。残りはCPUにできます。HOSTは最初のHUMAN TEAMを担当します。</p><div class=setupgrid><div class=slot><label class=desc>SEASONS</label><select id=osc>${[3,5,7].map(n=>`<option value="${n}" ${n===7?"selected":""}>${n} SEASONS</option>`).join("")}</select></div><div class=slot><label class=desc>チーム数</label><select id=opc onchange=onlineInputs()>${[4,5,6,7,8].map(n=>`<option>${n}</option>`).join("")}</select></div></div><div id=oinputs class=setupgrid></div><button class=big onclick=createOnlineRoom()>ROOMを作成</button><button class=ghost style="width:100%;margin-top:9px" onclick=openOnlineHub()>← BACK</button></div>`}
@@ -934,7 +941,7 @@ function render(){
  else if(S.room.phase==="playoff_reorg")html=playoffReorgOnlineScreen();
  else if(S.room.phase==="playoffs"){html=playoffScreen();let pg=pendingCpuPlayoff();if(pg&&hostCanCpu())cpuLater(()=>simLeagueGame("playoff",pg.id),420)}
  else if(S.room.phase==="season_end"){html=seasonEnd();if(isOnline()&&!NET.isHost)html=disableExactAction(html,"advance")}
- else html=`<div class=panel><div class=seasoncard><div class=stage>VER.0.5.1 COMPLETE</div><div class=title>${S.room.maxSeason} SEASONS COMPLETE</div><div class=notice>最終ロスターはROSTERS、全Seasonの順位推移・Regular Season・Playoff ChampionはRESULTSから確認できます。</div><button class=ghost style="width:100%;margin-top:10px" onclick=goHome()>HOME</button></div></div>`;
+ else html=`<div class=panel><div class=seasoncard><div class=stage>VER.0.5.2 COMPLETE</div><div class=title>${S.room.maxSeason} SEASONS COMPLETE</div><div class=notice>最終ロスターはROSTERS、全Seasonの順位推移・Regular Season・Playoff ChampionはRESULTSから確認できます。</div><button class=ghost style="width:100%;margin-top:10px" onclick=goHome()>HOME</button></div></div>`;
  g.innerHTML=(isOnline()?networkBar():"")+html;
 }
 window.addEventListener("beforeunload",()=>{try{STATE_STREAM?.close();MEMBER_STREAM?.close()}catch(e){}});
