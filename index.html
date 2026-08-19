@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07101c">
-<title>PLAY CALL - FRANCHISE MODE Ver.0.5.6</title>
+<title>PLAY CALL - FRANCHISE MODE Ver.0.6.0</title>
 <style>
 :root{--panel:#0f1a29;--line:#2a3e56;--text:#f5f7fb;--muted:#9fb0c4;--gold:#d9ad4f;--green:#63d18f;--red:#ef7070}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -12%,#25456d 0,transparent 35%),linear-gradient(#08111f,#050a12);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI","Noto Sans JP",sans-serif;min-height:100vh}
@@ -39,14 +39,17 @@
 .homeGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.homeChoice{border:1px solid #30475f;background:#08131f;border-radius:14px;padding:16px;text-align:left;color:#eef3f8}.homeChoice b{display:block;font-size:17px;margin-bottom:4px}.homeChoice span{font-size:10px;color:#9fb0c4;line-height:1.45}.netbar{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;border:1px solid #31506d;background:#091725;border-radius:12px;padding:8px 10px;margin-bottom:10px;font-size:10px}.netdot{width:9px;height:9px;border-radius:50%;background:#ef7070;box-shadow:0 0 0 3px #ef707022}.netdot.on{background:#63d18f;box-shadow:0 0 0 3px #63d18f22}.netroom{font-weight:950;color:#ffe1a0}.netme{text-align:right;color:#b9c7d6}.onlineTeams{display:grid;gap:7px;margin-top:10px}.onlineTeam{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;border:1px solid #2a3e56;background:#08131f;border-radius:11px;padding:10px}.onlineTeam .claimed{color:#93e2ad;font-size:10px;font-weight:900}.onlineTeam .open{color:#ffe0a0;font-size:10px;font-weight:900}.roomCode{font-size:34px;letter-spacing:.15em;font-weight:950;color:#ffcf4a;text-align:center;margin:7px 0}.waitIcon{font-size:30px;text-align:center;margin-bottom:5px}.miniBtn{border:1px solid #3a526d;background:#101e2d;color:#eef3f8;border-radius:9px;padding:7px 9px;font-weight:900;font-size:10px}.big:disabled,.ghost:disabled,.miniBtn:disabled{opacity:.38}.onlineHelp{font-size:9px;color:#8fa3b7;line-height:1.5;margin-top:8px}.hostTag{display:inline-block;border:1px solid #7e642c;color:#ffe0a0;border-radius:99px;padding:2px 6px;font-size:8px}.copyRow{display:grid;grid-template-columns:1fr auto;gap:7px;align-items:center}.readOnly{opacity:.72;pointer-events:none}
 @media(max-width:580px){.homeGrid{grid-template-columns:1fr}.netbar{grid-template-columns:auto 1fr}.netme{grid-column:2;text-align:left}.onlineTeam{grid-template-columns:1fr auto}}
 
+
+/* Ver.0.6.0 */
+.headlineEvent{background:linear-gradient(90deg,rgba(217,173,79,.10),transparent);border-left:2px solid var(--gold);padding-left:6px}.headlineTag{display:inline-block;border:1px solid var(--gold);color:#ffe3a0;border-radius:99px;padding:2px 5px;font-size:8px;font-weight:950;letter-spacing:.05em}.readyStrip{display:flex;justify-content:space-between;gap:8px;margin:8px 0;padding:8px 10px;border:1px solid #2b4058;border-radius:11px;background:#08131f;color:#aebdca;font-size:9px}.readyStrip b{color:#ffe3a0}
 </style>
 </head>
 <body>
-<div class=app><div class=hero><div class=brand>PLAY CALL SERIES</div><h1>FRANCHISE <span>MODE</span></h1><div class=sub>Prototype Ver.0.5.6 — ONLINE MULTIPLAYER</div></div><div id=game></div></div>
+<div class=app><div class=hero><div class=brand>PLAY CALL SERIES</div><h1>FRANCHISE <span>MODE</span></h1><div class=sub>Prototype Ver.0.6.0 — ONLINE MULTIPLAYER</div></div><div id=game></div></div>
 <div class=bottom><div class=bottomin><button onclick=openLeague()>🏈 ROSTERS</button><button onclick=openHistory()>📜 DRAFT</button><button onclick=openResults()>🏆 RESULTS</button><button onclick=openFA()>🧾 FA</button><button onclick=resetGame()>↻ RESET</button></div></div>
 <div id=modal class=modal onclick="if(event.target===this)this.classList.remove('show')"><div class=sheet><div id=modalbody></div><button class=ghost style="width:100%;margin-top:10px" onclick="document.getElementById('modal').classList.remove('show')">閉じる</button></div></div>
 <script>
-const VERSION="0.5.6",KEY="pc_franchise_v0560";
+const VERSION="0.6.0",KEY="pc_franchise_v0600";
 const BASE_CAPS={1:100,2:115,3:125},NEED={HC:1,QB:1,OF:3,DF:3},POS=["HC","QB","OF","DF"];
 const COUNTS={QB:{S:3,A:9,B:10,C:8},HC:{S:3,A:9,B:10,C:8},OF:{S:9,A:27,B:30,C:24},DF:{S:9,A:27,B:30,C:24}};
 const RANGE={S:[90,99],A:[80,89],B:[70,79],C:[60,69]},RSAL={S:20,A:15,B:5,C:1},TYPES=[["王道",70],["晩成",15],["即戦力",10],["一発屋",5]];
@@ -212,6 +215,7 @@ function cpuDraftScore(p,c){
    if(c.rank==="S")score+=5;
  }
  if(c.age===1)score+=4;
+ score+=({"王道":0.5,"晩成":3,"即戦力":2,"一発屋":0.5})[c.type]||0;
  return score
 }
 function cpuPick(){
@@ -810,7 +814,7 @@ function render(){
    Firebase Realtime Database REST + Server-Sent Events
    ========================================================= */
 const DEFAULT_DB_URL="https://play-call-franchise-default-rtdb.asia-southeast1.firebasedatabase.app";
-const NETKEY="pc_franchise_net_v0560";
+const NETKEY="pc_franchise_net_v0600";
 let APPLYING_REMOTE=false,REMOTE_QUEUE=Promise.resolve(),STATE_STREAM=null,MEMBER_STREAM=null,POLL_TIMER=null,CPU_TIMER=null;
 function deviceCode(){return"D-"+Math.random().toString(36).slice(2,10).toUpperCase()}
 function netLoad(){try{let n=JSON.parse(localStorage.getItem(NETKEY))||{};return{dbUrl:n.dbUrl||DEFAULT_DB_URL,roomCode:n.roomCode||"",deviceId:n.deviceId||deviceCode(),localPlayerId:n.localPlayerId??null,isHost:!!n.isHost,connected:false,members:{},lastError:""}}catch(e){return{dbUrl:DEFAULT_DB_URL,roomCode:"",deviceId:deviceCode(),localPlayerId:null,isHost:false,connected:false,members:{},lastError:""}}}
@@ -875,10 +879,10 @@ function streamStateEvent(ev){try{let x=JSON.parse(ev.data);if(x.path==="/"&&x.d
 function startStreams(){closeStreams();if(!NET.roomCode||!dbReady())return;try{STATE_STREAM=new EventSource(dbEndpoint(`rooms/${NET.roomCode}/state`));STATE_STREAM.addEventListener("put",streamStateEvent);STATE_STREAM.addEventListener("patch",streamStateEvent);STATE_STREAM.onopen=()=>{NET.connected=true;NET.lastError="";renderNetBarOnly()};STATE_STREAM.onerror=()=>{NET.lastError="LIVE STREAM unavailable — polling";renderNetBarOnly()};MEMBER_STREAM=new EventSource(dbEndpoint(`rooms/${NET.roomCode}/members`));let mem=()=>refreshMembers();MEMBER_STREAM.addEventListener("put",mem);MEMBER_STREAM.addEventListener("patch",mem)}catch(e){console.warn("SSE unavailable, polling remains active",e)}POLL_TIMER=setInterval(refreshRemoteSnapshots,1200)}
 async function resumeOnline(){if(!NET.roomCode||!dbReady())return;try{let room=await dbGet(`rooms/${NET.roomCode}`);if(!room){clearOnlineSession();return}NET.members=room.members||{};let mine=NET.members[NET.deviceId];if(mine)NET.localPlayerId=mine.playerId??null;NET.connected=true;if(room.state){APPLYING_REMOTE=true;S=normalizeRemoteState(room.state);saveLocal();APPLYING_REMOTE=false}startStreams();render()}catch(e){NET.connected=false;NET.lastError=e.message;render()}}
 function networkBar(){if(!isOnline())return"";let me=localTeam(),role=NET.isHost?'<span class=hostTag>HOST</span>':"";return`<div id=netbar class=netbar><span class="netdot ${NET.connected?"on":""}"></span><div><span class=netroom>ROOM ${esc(NET.roomCode)}</span> ${role}<div class=type>${NET.connected?"SYNC CONNECTED":"RECONNECTING / POLLING"}</div></div><div class=netme>${me?`YOU: ${esc(me.name)}`:"TEAM未選択"}</div></div>`}
-function homeScreen(){return`<div class=panel><div class=stage>PLAY CALL SERIES</div><div class=title>FRANCHISE MODE</div><div class=desc>Ver.0.5.6では従来のLOCAL PLAYに加え、友達とそれぞれの端末から同じFranchiseへ参加できます。</div><div class=homeGrid><button class=homeChoice onclick=startLocalSetup()><b>📱 LOCAL PLAY</b><span>従来どおり1端末でHUMAN / CPUを進行。</span></button><button class=homeChoice onclick=openOnlineHub()><b>🌐 ONLINE PLAY</b><span>ROOM CODEで接続。各HUMANが自分の端末から操作。</span></button></div></div>`}
+function homeScreen(){return`<div class=panel><div class=stage>PLAY CALL SERIES</div><div class=title>FRANCHISE MODE</div><div class=desc>Ver.0.6.0では従来のLOCAL PLAYに加え、友達とそれぞれの端末から同じFranchiseへ参加できます。</div><div class=homeGrid><button class=homeChoice onclick=startLocalSetup()><b>📱 LOCAL PLAY</b><span>従来どおり1端末でHUMAN / CPUを進行。</span></button><button class=homeChoice onclick=openOnlineHub()><b>🌐 ONLINE PLAY</b><span>ROOM CODEで接続。各HUMANが自分の端末から操作。</span></button></div></div>`}
 function startLocalSetup(){clearOnlineSession();S=fresh();S.room.mode="local";S.room.phase="setup";saveLocal();render();topNow()}
 function openOnlineHub(){clearOnlineSession();S=fresh();S.room.mode="local";S.room.phase="online_hub";saveLocal();render();topNow()}
-function onlineHubScreen(){NET.dbUrl=DEFAULT_DB_URL;netSave();return`<div class=panel><div class=stage>ONLINE MULTIPLAYER</div><div class=title>CONNECT</div><div class="notice success">ONLINE DATABASE READY<br><span class=type>接続先はVer.0.5.6に組み込み済みです。友達にはこのゲームURLとROOM CODEだけ共有してください。</span></div><button class=big onclick=goOnlineCreate()>CREATE ROOM</button><div style="height:8px"></div><div class=copyRow><input id=joincode maxlength=8 placeholder="ROOM CODE"><button class=ghost onclick=joinOnlineRoom()>JOIN</button></div><button class=ghost style="width:100%;margin-top:9px" onclick=goHome()>← HOME</button><div class=onlineHelp>商用向けのログイン・戦績保存・強固な不正対策はVer.0.5.6では未実装です。Firebase側のDatabase Rules設定が必要です。</div></div>`}
+function onlineHubScreen(){NET.dbUrl=DEFAULT_DB_URL;netSave();return`<div class=panel><div class=stage>ONLINE MULTIPLAYER</div><div class=title>CONNECT</div><div class="notice success">ONLINE DATABASE READY<br><span class=type>接続先はVer.0.6.0に組み込み済みです。友達にはこのゲームURLとROOM CODEだけ共有してください。</span></div><button class=big onclick=goOnlineCreate()>CREATE ROOM</button><div style="height:8px"></div><div class=copyRow><input id=joincode maxlength=8 placeholder="ROOM CODE"><button class=ghost onclick=joinOnlineRoom()>JOIN</button></div><button class=ghost style="width:100%;margin-top:9px" onclick=goHome()>← HOME</button><div class=onlineHelp>商用向けのログイン・戦績保存・強固な不正対策はVer.0.6.0では未実装です。Firebase側のDatabase Rules設定が必要です。</div></div>`}
 function readDbUrl(){let v=normalizeDbUrl(DEFAULT_DB_URL);NET.dbUrl=v;netSave();return v}
 function goOnlineCreate(){if(!readDbUrl())return;S=fresh();S.room.mode="online";S.room.phase="online_setup";saveLocal();render();setTimeout(onlineInputs,0);topNow()}
 function onlineSetupScreen(){return`<div class=panel><div class=stage>ONLINE — NEW FRANCHISE</div><div class=title>ROOM SETUP</div><p class=desc>4〜8チーム。ONLINEではHUMANを2人以上に設定してください。残りはCPUにできます。HOSTは最初のHUMAN TEAMを担当します。</p><div class=setupgrid><div class=slot><label class=desc>SEASONS</label><select id=osc>${[3,5,7].map(n=>`<option value="${n}" ${n===7?"selected":""}>${n} SEASONS</option>`).join("")}</select></div><div class=slot><label class=desc>チーム数</label><select id=opc onchange=onlineInputs()>${[4,5,6,7,8].map(n=>`<option>${n}</option>`).join("")}</select></div></div><div id=oinputs class=setupgrid></div><button class=big onclick=createOnlineRoom()>ROOMを作成</button><button class=ghost style="width:100%;margin-top:9px" onclick=openOnlineHub()>← BACK</button></div>`}
@@ -957,7 +961,7 @@ function gameDayScreen(){let g=S.gameDay;if(!g)return"";if(!isOnline()&&(g.phase
 
 
 /* =========================
-   Ver.0.5.6 — ORDERED GAME DAY
+   Ver.0.6.0 — ORDERED GAME DAY
    Regular Season games are processed strictly from the top of the schedule.
    The first pending game is the only unlocked WEEK on every device.
    ========================= */
@@ -1028,6 +1032,369 @@ function gdScoreboard(g){
  return`<div class=panel>${header}<div class=gdScoreboard><div class=gdSide><div class=gdName>${a.name}${a.cpu?" 🤖":""}</div><div class=gdScore>${g.scoreA}</div><div class=gdTag>POWER ${power(a)} / EDGE ${e.A>=0?"+":""}${e.A.toFixed(1)}</div></div><div class=gdMid><div class=gdQ>${String(g.phase||"").startsWith("ot")?`OT${g.otRound}`:`Q${g.quarter}`}</div><div class=type>GAME DAY</div></div><div class="gdSide right"><div class=gdName>${b.name}${b.cpu?" 🤖":""}</div><div class=gdScore>${g.scoreB}</div><div class=gdTag>POWER ${power(b)} / EDGE ${e.B>=0?"+":""}${e.B.toFixed(1)}</div></div></div><div class=gdQuarters>${[1,2,3,4].map(q=>`<div class="gdQdot ${g.quarter===q&&!String(g.phase||"").startsWith("ot")?"now":""} ${logs.some(x=>x?.quarter===q)?"done":""}">Q${q}</div>`).join("")}</div></div>`
 }
 
+
+/* =========================
+   Ver.0.6.0 — SIMULTANEOUS ONLINE ROSTER BUILD
+   Draft order stays sequential. The first post-draft ROSTER BUILD is parallel for HUMAN teams.
+   FINAL ROSTER / FA remains waiver-order sequential because the FA pool is shared.
+   Each HUMAN build is stored under rooms/{ROOM}/builds/{season}/{playerId}, so simultaneous
+   edits never overwrite another player's roster in the shared root state.
+   ========================= */
+let BUILD_QUEUE=Promise.resolve(),ONLINE_BUILD_FINALIZING=false;
+
+function buildSeasonKey(){return String(S?.room?.season||1)}
+function onlineBuildMap(){return NET.builds&&typeof NET.builds==="object"?NET.builds:{}}
+function onlineBuildEntry(pid){return onlineBuildMap()[String(pid)]||onlineBuildMap()[pid]||null}
+function sanitizeBuildIds(p,ids){let own=new Set(asArray(p?.owned));return [...new Set(asArray(ids).filter(id=>own.has(id)))]}
+function applyBuildEntryToPlayer(p,e){
+ if(!p||!e)return;
+ let active=sanitizeBuildIds(p,e.active),activeSet=new Set(active),practice=sanitizeBuildIds(p,e.practice).filter(id=>!activeSet.has(id));
+ p.active=active;p.practice=practice
+}
+function mergeOnlineBuildDrafts(){
+ if(!isOnline()||S?.room?.phase!=="build")return;
+ for(const p of S.players){let e=onlineBuildEntry(p.id);if(e)applyBuildEntryToPlayer(p,e)}
+}
+function onlineBuildProgressHTML(){
+ let rows=S.players.map(p=>{
+   if(p.cpu)return`<div class=onlineTeam><div><b>${esc(p.name)}</b><div class=type>CPU GM</div></div><span class=claimed>AUTO</span></div>`;
+   let e=onlineBuildEntry(p.id),ready=!!e?.ready,mine=NET.localPlayerId===p.id;
+   return`<div class=onlineTeam><div><b>${esc(p.name)}${mine?" — YOU":""}</b><div class=type>HUMAN</div></div><span class="${ready?"claimed":"open"}">${ready?"✓ READY":"BUILDING"}</span></div>`
+ }).join("");
+ return`<div class=panel><div class=stage>ONLINE ROSTER BUILD</div><div class=title>ALL HUMAN TEAMS — SIMULTANEOUS</div><div class=notice>ドラフト後の第1次ROSTER BUILDは各HUMANが同時に操作できます。全HUMANがREADYになると、CPU編成を確定してTraining Campへ自動で進みます。<br><b>Training Camp後のFINAL ROSTER / FAは従来どおりWAIVER順で1TEAMずつです。</b></div><div class=onlineTeams>${rows}</div></div>`
+}
+function onlineBuildWaitHTML(){return`${onlineBuildProgressHTML()}<div class=panel><div class=seasoncard><div class=waitIcon>✓</div><div class=stage>ROSTER LOCKED</div><div class=title>あなたのROSTERは確定済み</div><div class=notice>ほかのHUMAN TEAMの確定を待っています。全員READYになると自動でTraining Campへ進みます。</div></div></div>`}
+
+function beginBuild(){
+ if(!isOnline()){S.room.phase="build";S.rosterPlayer=0;S.rosterPos="HC";S.players.forEach(p=>{p.active=p.active.filter(id=>p.owned.includes(id));p.practice=p.practice.filter(id=>p.owned.includes(id))});return}
+ S.room.phase="build";S.rosterPlayer=0;S.rosterPos="HC";
+ S.players.forEach(p=>{p.active=asArray(p.active).filter(id=>asArray(p.owned).includes(id));p.practice=asArray(p.practice).filter(id=>asArray(p.owned).includes(id))});
+ NET.builds={}
+}
+
+function queueOnlineBuildSnapshot(p,ready=false){
+ if(!isOnline()||S.room.phase!=="build"||!p)return Promise.resolve();
+ let entry={playerId:p.id,active:[...asArray(p.active)],practice:[...asArray(p.practice)],ready:!!ready,updatedAt:Date.now(),deviceId:NET.deviceId};
+ NET.builds=onlineBuildMap();NET.builds[String(p.id)]=entry;
+ saveLocal();
+ let room=NET.roomCode,season=buildSeasonKey();
+ BUILD_QUEUE=BUILD_QUEUE.catch(()=>{}).then(async()=>{
+   try{await dbWriteRetry(()=>dbPut(`rooms/${room}/builds/${season}/${p.id}`,entry),2);NET.connected=true;NET.lastError=""}
+   catch(e){NET.lastError=e.message;console.error("build sync",e);renderNetBarOnly();throw e}
+ });
+ return BUILD_QUEUE
+}
+
+function setOwnedStatus(pid,uid,status){
+ if(!isOnline()||S.room.phase!=="build"){let p=S.players.find(x=>x.id===pid),c=card(uid);if(!p||!c)return;p.active=p.active.filter(x=>x!==uid);p.practice=p.practice.filter(x=>x!==uid);if(status==="active"){if(ac(p,c.pos)>=NEED[c.pos])return alert(`${c.pos}枠は埋まっています。`);p.active.push(uid)}else if(status==="practice"){if(p.practice.length>=3)return alert("PRACTICE SQUADは最大3人です。");p.practice.push(uid)}save();render();return}
+ if(NET.localPlayerId!==pid)return;
+ let p=teamById(pid),c=card(uid),e=onlineBuildEntry(pid);if(!p||!c||p.cpu||e?.ready)return;
+ p.active=asArray(p.active).filter(x=>x!==uid);p.practice=asArray(p.practice).filter(x=>x!==uid);
+ if(status==="active"){
+   if(ac(p,c.pos)>=NEED[c.pos])return alert(`${c.pos}枠は埋まっています。`);
+   p.active.push(uid)
+ }else if(status==="practice"){
+   if(p.practice.length>=3)return alert("PRACTICE SQUADは最大3人です。");
+   p.practice.push(uid)
+ }
+ queueOnlineBuildSnapshot(p,false);render()
+}
+
+async function confirmBuild(){
+ if(!isOnline()||S.room.phase!=="build"){let p=S.players[S.rosterPlayer],w=warning(p);if(w.over>0)return alert(`ACTIVE CAPを$${w.over}超過しています。`);if(w.totalOver>0)return alert(`TOTAL CAPを$${w.totalOver}超過しています。`);if(w.ps>3)return alert("PRACTICE SQUADは3人までです。");if(w.missing.length&&!confirm(`空席：${w.missing.join(" / ")}\nTraining Camp後のFINAL ROSTERでFA補強できます。このロスターでCampへ進みますか？`))return;cutUnkept(p);S.rosterPlayer++;S.rosterPos="HC";if(S.rosterPlayer>=S.players.length)beginCamp();save();render();topNow();return}
+ let p=localTeam();if(!p||p.cpu)return;
+ if(onlineBuildEntry(p.id)?.ready)return;
+ let w=warning(p);
+ if(w.over>0)return alert(`ACTIVE CAPを$${w.over}超過しています。`);
+ if(w.totalOver>0)return alert(`TOTAL CAPを$${w.totalOver}超過しています。`);
+ if(w.ps>3)return alert("PRACTICE SQUADは3人までです。");
+ if(w.missing.length&&!confirm(`空席：${w.missing.join(" / ")}\nTraining Camp後のFINAL ROSTERでFA補強できます。このロスターでCampへ進みますか？`))return;
+ try{
+   await queueOnlineBuildSnapshot(p,true);
+   render();topNow();
+   if(NET.isHost)await maybeFinalizeOnlineBuild()
+ }catch(e){alert(`ROSTER確定の同期に失敗しました。\n${e.message}`)}
+}
+
+function build(){
+ if(!isOnline()){
+   let p=S.players[S.rosterPlayer];if(p?.cpu)return`<div class=panel><div class=stage>CPU GM</div><div class=title>${p.name}</div><div class=notice>CAP・POWER・将来価値を評価してロスターを自動構築しています。</div></div>`;
+   let pos=S.rosterPos,w=warning(p),list=p.owned.map(card).filter(c=>c.pos===pos);return`<div class=panel><div class=stage>SEASON ${S.room.season} — ROSTER BUILD</div><div class=title>${p.name}</div><div class=summary><div class=metric><div class=k>TEAM POWER</div><div class=v>${power(p)}</div></div><div class=metric><div class=k>ACTIVE CAP</div><div class=v>$${cap(p)}/$${capLimit()}</div></div><div class=metric><div class=k>TOTAL CAP</div><div class=v>$${totalCap(p)}/$${totalCapLimit()}</div></div><div class=metric><div class=k>ROSTER</div><div class=v>${p.active.length}/8</div></div><div class=metric><div class=k>PRACTICE</div><div class=v>${p.practice.length}/3</div></div></div><div class=notice>HC ${ac(p,"HC")}/1 QB ${ac(p,"QB")}/1 OF ${ac(p,"OF")}/3 DF ${ac(p,"DF")}/3 | HC MULT ×${hcMultiplier(p).toFixed(2)}</div>${w.over>0?`<div class="notice warning">CAP OVER $${w.over}</div>`:""}</div><div class=panel><div class=tabs>${POS.map(x=>`<button class="tab ${x===pos?"on":""}" onclick="setRPos('${x}')">${x}<br>${p.owned.map(card).filter(c=>c.pos===x).length}</button>`).join("")}</div><div class=grid>${list.map(c=>playerCard(p,c)).join("")||"<div class=desc>選手なし</div>"}</div><button class=big onclick=confirmBuild()>${S.rosterPlayer<S.players.length-1?"ロスター確定 → 次のPLAYER":"第1次ロスター構築 完了"}</button></div>`
+ }
+ mergeOnlineBuildDrafts();
+ let p=localTeam();if(!p)return`${onlineBuildProgressHTML()}${waitForPlayerScreen(null,"ROSTER BUILD")}`;
+ let e=onlineBuildEntry(p.id);if(e?.ready)return onlineBuildWaitHTML();
+ let pos=POS.includes(S.rosterPos)?S.rosterPos:"HC";S.rosterPos=pos;
+ let w=warning(p),list=asArray(p.owned).map(card).filter(c=>c&&c.pos===pos);
+ return`${onlineBuildProgressHTML()}<div class=panel><div class=stage>SEASON ${S.room.season} — YOUR ROSTER BUILD</div><div class=title>${esc(p.name)}</div><div class=summary><div class=metric><div class=k>TEAM POWER</div><div class=v>${power(p)}</div></div><div class=metric><div class=k>ACTIVE CAP</div><div class=v>$${cap(p)}/$${capLimit()}</div></div><div class=metric><div class=k>TOTAL CAP</div><div class=v>$${totalCap(p)}/$${totalCapLimit()}</div></div><div class=metric><div class=k>ROSTER</div><div class=v>${p.active.length}/8</div></div><div class=metric><div class=k>PRACTICE</div><div class=v>${p.practice.length}/3</div></div></div><div class=notice>HC ${ac(p,"HC")}/1 QB ${ac(p,"QB")}/1 OF ${ac(p,"OF")}/3 DF ${ac(p,"DF")}/3 | HC MULT ×${hcMultiplier(p).toFixed(2)}</div>${w.over>0?`<div class="notice warning">CAP OVER $${w.over}</div>`:""}</div><div class=panel><div class=tabs>${POS.map(x=>`<button class="tab ${x===pos?"on":""}" onclick="setRPos('${x}')">${x}<br>${asArray(p.owned).map(card).filter(c=>c&&c.pos===x).length}</button>`).join("")}</div><div class=grid>${list.map(c=>playerCard(p,c)).join("")||"<div class=desc>選手なし</div>"}</div><button class=big onclick=confirmBuild()>このROSTERでREADY</button></div>`
+}
+
+async function maybeFinalizeOnlineBuild(){
+ if(!isOnline()||!NET.isHost||S.room.phase!=="build"||ONLINE_BUILD_FINALIZING)return;
+ ONLINE_BUILD_FINALIZING=true;
+ try{
+   let season=buildSeasonKey(),builds=await dbGet(`rooms/${NET.roomCode}/builds/${season}`)||{};
+   NET.builds=builds;
+   let humans=S.players.filter(p=>!p.cpu);
+   if(humans.some(p=>!((builds[String(p.id)]||builds[p.id])?.ready)))return;
+   let remote=await dbGet(`rooms/${NET.roomCode}/state`);if(remote)S=normalizeRemoteState(remote);
+   S.room.phase="build";
+   for(const p of S.players.filter(x=>!x.cpu)){
+     let e=builds[String(p.id)]||builds[p.id];applyBuildEntryToPlayer(p,e);cutUnkept(p)
+   }
+   for(const p of S.players.filter(x=>x.cpu))cpuOptimize(p);
+   S.room.phase="camp";applyCamp();S.campPlayer=0;S.rosterPlayer=0;S.rosterPos="HC";
+   S.room.syncRev=(S.room.syncRev||0)+1;S.room.syncAt=Date.now();
+   saveLocal();render();topNow();
+   await pushOnlineSnapshotNow(JSON.parse(JSON.stringify(S)),"camp");
+   try{await dbDelete(`rooms/${NET.roomCode}/builds/${season}`)}catch(e){console.warn("build cleanup",e)}
+   NET.builds={}
+ }catch(e){NET.lastError=e.message;console.error("build finalize",e);renderNetBarOnly()}
+ finally{ONLINE_BUILD_FINALIZING=false}
+}
+
+/* Build nodes are merged separately from the shared state snapshot. */
+function applyRemoteState(data){
+ if(!data||typeof data!=="object")return;data=normalizeRemoteState(data);
+ let rr=data.room?.syncRev||0,lr=S?.room?.syncRev||0;if(S?.room?.mode==="online"&&S.room.id===data.room?.id&&rr<=lr)return;
+ let prevPhase=S?.room?.phase,prevTurn=S?.draft?.turn,keepPos=S?.rosterPos;
+ let localDraft=null;
+ if(data.room?.phase==="build"&&S?.room?.phase==="build"&&NET.localPlayerId!==null){let p=localTeam();if(p)localDraft={active:[...asArray(p.active)],practice:[...asArray(p.practice)]}}
+ APPLYING_REMOTE=true;S=data;
+ if(localDraft){let p=teamById(NET.localPlayerId);if(p){p.active=localDraft.active;p.practice=localDraft.practice}if(POS.includes(keepPos))S.rosterPos=keepPos}
+ mergeOnlineBuildDrafts();saveLocal();APPLYING_REMOTE=false;NET.connected=true;NET.lastError="";render();if(prevPhase!==S.room?.phase||prevTurn!==S.draft?.turn)topNow()
+}
+async function refreshRemoteSnapshots(){
+ if(!NET.roomCode||!dbReady())return;
+ try{
+   let room=await dbGet(`rooms/${NET.roomCode}`);if(!room){if(!NET.isHost){clearOnlineSession();S=fresh();saveLocal();render();alert("オンラインROOMが終了しました。")}return}
+   NET.members=room.members||{};NET.connected=true;
+   if(room.state?.room?.phase==="build")NET.builds=(room.builds||{})[String(room.state.room.season)]||{};else NET.builds={};
+   if(room.state)applyRemoteState(room.state);
+   if(S.room.phase==="build"){mergeOnlineBuildDrafts();saveLocal();render();if(NET.isHost)maybeFinalizeOnlineBuild()}
+ }catch(e){NET.connected=false;NET.lastError=e.message;renderNetBarOnly()}
+}
+async function resumeOnline(){
+ if(!NET.roomCode||!dbReady())return;
+ try{
+   let room=await dbGet(`rooms/${NET.roomCode}`);if(!room){clearOnlineSession();return}
+   NET.members=room.members||{};let mine=NET.members[NET.deviceId];if(mine)NET.localPlayerId=mine.playerId??null;NET.connected=true;
+   if(room.state){APPLYING_REMOTE=true;S=normalizeRemoteState(room.state);NET.builds=S.room?.phase==="build"?((room.builds||{})[String(S.room.season)]||{}):{};mergeOnlineBuildDrafts();saveLocal();APPLYING_REMOTE=false}
+   startStreams();render();if(S.room.phase==="build"&&NET.isHost)maybeFinalizeOnlineBuild()
+ }catch(e){NET.connected=false;NET.lastError=e.message;render()}
+}
+
+/* GAME DAY result color is from the local player's perspective in ONLINE PvP. */
+function gdPerspectiveResultClass(g,winnerSide){
+ if(!winnerSide)return"tie";
+ if(!isOnline())return winnerSide==="A"?"win":"loss";
+ let mine=NET.localPlayerId===g.aId?"A":NET.localPlayerId===g.bId?"B":null;
+ return mine?(winnerSide===mine?"win":"loss"):(winnerSide==="A"?"win":"loss")
+}
+function gdResultHTML(g){let L=g.last,a=gdTeam(g,"A"),b=gdTeam(g,"B"),ac=asArray(L.aCards).map(card).filter(Boolean),bc=asArray(L.bCards).map(card).filter(Boolean),winner=L.diff>0?"A":L.diff<0?"B":null,win=gdPerspectiveResultClass(g,winner);return`${gdScoreboard(g)}<div class=panel><div class=stage>QUARTER ${L.quarter} RESULT</div><div class=title>SHOWDOWN</div><div class=gdMatch><div class=gdBox><div class=stage>${a.name}</div><div class=gdPair>${ac.map(c=>`<div class=gdMini><div class=pos>${c.pos}</div><b>${ep(c)}</b></div>`).join("")}</div><div class=gdRound>${L.ap}</div><div class=gdSub>${asArray(L.aTags).join(" + ")||"NO SYNERGY"} / EDGE ${L.aEdge>=0?"+":""}${L.aEdge.toFixed(1)}</div></div><div class=gdVs>VS</div><div class=gdBox><div class=stage>${b.name}</div><div class=gdPair>${bc.map(c=>`<div class=gdMini><div class=pos>${c.pos}</div><b>${ep(c)}</b></div>`).join("")}</div><div class=gdRound>${L.bp}</div><div class=gdSub>${asArray(L.bTags).join(" + ")||"NO SYNERGY"} / EDGE ${L.bEdge>=0?"+":""}${L.bEdge.toFixed(1)}</div></div></div><div class="gdBanner ${win}">${L.diff>0?`${a.name} +${L.pts}`:L.diff<0?`${b.name} +${L.pts}`:"NO SCORE"} / POWER差 ${Math.abs(L.diff).toFixed(1)}</div><button class=big onclick=gdNext()>${g.quarter>=4?"4Q RESULT → NEXT":"次のQUARTERへ"}</button></div>${gdLogHTML(g)}`}
+function gdOTResultHTML(g){let L=g.last,a=gdTeam(g,"A"),b=gdTeam(g,"B"),ac=card(asArray(L.aCards)[0]),bc=card(asArray(L.bCards)[0]),winner=L.roundWinner==="A"?"A":L.roundWinner==="B"?"B":null,cls=gdPerspectiveResultClass(g,winner);return`${gdScoreboard(g)}<div class=panel><div class=stage>${L.quarter} RESULT</div><div class=title>1 CARD SHOWDOWN</div><div class=gdMatch><div class=gdBox><div class=stage>${a.name}</div><div class=gdRound>${ep(ac)} → ${L.ap}</div><div class=gdSub>${ac.pos}</div></div><div class=gdVs>VS</div><div class=gdBox><div class=stage>${b.name}</div><div class=gdRound>${ep(bc)} → ${L.bp}</div><div class=gdSub>${bc.pos}</div></div></div><div class="gdBanner ${cls}">${L.adv} / SERIES ${L.aWins}-${L.bWins}</div><button class=big onclick=gdNextOT()>${g.otWinsA>=2||g.otWinsB>=2?"FINAL RESULT":"次のOT ROUNDへ"}</button></div>${gdLogHTML(g)}`}
+
+
+/* =========================================================
+   Ver.0.6.0 — MULTIPLAYER + PLAYER IDENTITY UPDATE
+   - ONLINE: 2–4 HUMAN devices in one Franchise
+   - Draft stays sequential / first ROSTER BUILD stays simultaneous
+   - GAME DAY card selection is simultaneous for both HUMAN teams
+   - Player TYPE is visible and affects Training Camp behavior
+   - Camp: 4 normal events + 1 HEADLINE EVENT per team
+   - Playoff Form: 2 players, postseason-only temporary modifier
+   ========================================================= */
+
+/* ---------- Player TYPE / compact UI ---------- */
+function traitLabel(c){return c?.type||"王道"}
+function formValue(c){return Number(c?.playoffForm?.value)||0}
+function persistentModTotal(c){return (c?.mods||[]).reduce((a,m)=>a+(Number(m?.value)||0),0)}
+function modTotal(c){return persistentModTotal(c)+formValue(c)}
+function cardStageTrait(c){let x=st(c);return`${x?.name||"ROOKIE"} · ${traitLabel(c)}${formValue(c)?` · FORM ${formValue(c)>0?"+":""}${formValue(c)}`:""}`}
+function cHTML(c,button=""){let x=st(c);return`<div class="card ${c.rank}"><div class=id>${c.uid}</div><div class=cardtop><div><span class="rank ${c.rank}">${c.rank}</span> <b>${c.pos}</b><div class=type>${cardStageTrait(c)}</div></div><div style=text-align:right><div class=pow>${ep(c)}${modTotal(c)?` <span style="font-size:11px">(${modTotal(c)>0?"+":""}${modTotal(c)})</span>`:""}</div><div class=sal>$${x.salary}</div></div></div>${button}</div>`}
+function compactCard(c){let x=st(c);return`<div class="compactCard ${c.rank}"><div><div class=pos>${c.pos}</div><div class=nm><span class="rank ${c.rank}">${c.rank}</span> ${c.pos}</div><div class=stg>${cardStageTrait(c)}</div></div><div class=r><div class=pow>${ep(c)}${modTotal(c)?` <span style="font-size:11px">(${modTotal(c)>0?"+":""}${modTotal(c)})</span>`:""}</div><div class=sal>$${x.salary}</div></div></div>`}
+function rosterDetail(p){
+ let h=p.active.map(card).find(c=>c.pos==="HC"),q=p.active.map(card).find(c=>c.pos==="QB"),ofs=p.active.map(card).filter(c=>c.pos==="OF").sort((a,b)=>ep(b)-ep(a)),dfs=p.active.map(card).filter(c=>c.pos==="DF").sort((a,b)=>ep(b)-ep(a)),cells=[h,q,ofs[0],dfs[0],ofs[1],dfs[1],ofs[2],dfs[2]],ps=sortByPos(p.practice.map(card).filter(Boolean));
+ return`<div class=compactGrid>${cells.map(c=>c?compactCard(c):'<div class=compactCard><div class=desc>EMPTY</div></div>').join("")}</div><div class=panel style="margin-top:10px"><div class=stage>PRACTICE SQUAD ${p.practice.length}/3</div><div class=psGrid>${ps.map(c=>`<div class=psCard><div>${c.pos} <span class="rank ${c.rank}">${c.rank}</span></div><div>${ep(c)}${modTotal(c)?` (${modTotal(c)>0?"+":""}${modTotal(c)})`:""} / $${st(c).salary}</div><div class=type>${cardStageTrait(c)}</div></div>`).join("")||"<div class=desc>なし</div>"}</div></div>`
+}
+function addHistory(p,c){let hs=S.draftHistory.filter(x=>x.season===S.room.season),overall=hs.length+1,round=Math.floor((overall-1)/S.players.length)+1,pickInRound=((overall-1)%S.players.length)+1;S.draftHistory.push({season:S.room.season,round,pickInRound,overall,playerId:p.id,playerName:p.name,uid:c.uid,pos:c.pos,rank:c.rank,type:traitLabel(c),power:st(c).power,salary:st(c).salary})}
+function openHistory(){let body=document.getElementById("modalbody"),seasons=[...new Set(S.draftHistory.map(x=>x.season))].sort((a,b)=>a-b),sel=seasons.at(-1)||S.room.season,mode="round",team=null;function row(x,label){let tp=x.type||traitLabel(card(x.uid));return`<div class=historyRow><div class=historyPick>${label}</div><div>${x.playerName}</div><div><span class="rank ${x.rank}">${x.rank}</span> ${x.pos}<div class=type>${tp}</div></div><div>${x.power}/$${x.salary}</div></div>`}function paint(){let hs=S.draftHistory.filter(x=>x.season===sel),rounds=[...new Set(hs.map(x=>x.round))],teams=[...new Set(hs.map(x=>x.playerId))];if(team===null&&!teams.includes(team))team=teams[0]??null;let content=mode==="round"?rounds.map(r=>`<div class=historyRound><div class=stage>ROUND ${r}</div>${hs.filter(x=>x.round===r).map(x=>row(x,`${r}.${String(x.pickInRound).padStart(2,"0")}`)).join("")}</div>`).join(""):(team===null?"":`<div class=teamnav>${teams.map(id=>{let p=S.players.find(x=>x.id===id),nm=p?.name||hs.find(x=>x.playerId===id)?.playerName||"TEAM";return`<button class="${id===team?"on":""}" onclick="window._histTeam(${id})">${nm}</button>`}).join("")}</div><div class=historyRound>${hs.filter(x=>x.playerId===team).map(x=>row(x,`${x.round}.${String(x.pickInRound).padStart(2,"0")}`)).join("")}</div>`);body.innerHTML=`<div class=stage>DRAFT HISTORY</div><div class=teamnav>${seasons.map(s=>`<button class="${s===sel?"on":""}" onclick="window._hist(${s})">SEASON ${s}</button>`).join("")}</div><div class=teamnav><button class="${mode==="round"?"on":""}" onclick="window._histMode('round')">ROUND別</button><button class="${mode==="team"?"on":""}" onclick="window._histMode('team')">TEAM別</button></div>${content||"<div class=desc>履歴なし</div>"}`}window._hist=s=>{sel=s;team=null;paint()};window._histMode=m=>{mode=m;team=null;paint()};window._histTeam=id=>{team=id;paint()};paint();document.getElementById("modal").classList.add("show")}
+
+/* ---------- Training Camp: personality + one headline ---------- */
+const CAMP_NORMAL_VALUES=[-5,-3,0,3,5];
+const CAMP_HEADLINE_VALUES=[-15,-10,-5,0,5,10,15];
+const CAMP_NORMAL_NAMES={"-5":"SLUMP","-3":"ROUGH CAMP","0":"STEADY","3":"GOOD CAMP","5":"GROWTH"};
+const CAMP_HEADLINE_NAMES={"-15":"COLLAPSE","-10":"MAJOR SLUMP","-5":"SETBACK","0":"SPOTLIGHT STEADY","5":"BIG STEP","10":"BREAKOUT","15":"MEGA BREAKOUT"};
+function campWeights(c,headline=false){
+ let t=traitLabel(c),age=c?.age||1;
+ if(!headline){
+   if(t==="一発屋")return[24,14,24,14,24];
+   if(t==="晩成")return age===1?[12,22,30,24,12]:age===2?[8,16,26,28,22]:[7,14,24,29,26];
+   if(t==="即戦力")return age===1?[7,14,24,29,26]:age===2?[10,20,30,25,15]:[12,23,30,23,12];
+   return[12,23,30,23,12]
+ }
+ if(t==="一発屋")return[22,13,7,16,7,13,22];
+ if(t==="晩成")return age===1?[5,10,20,30,20,10,5]:age===2?[4,7,13,23,24,17,12]:[3,6,11,20,24,20,16];
+ if(t==="即戦力")return age===1?[3,6,11,20,24,20,16]:age===2?[4,8,15,27,24,14,8]:[5,10,20,30,20,10,5];
+ return[5,10,20,30,20,10,5]
+}
+function weightedValue(values,weights){let total=weights.reduce((a,b)=>a+b,0),r=Math.random()*total,n=0;for(let i=0;i<values.length;i++){n+=weights[i];if(r<n)return values[i]}return values[Math.floor(values.length/2)]}
+function campRoll(c,headline=false){let values=headline?CAMP_HEADLINE_VALUES:CAMP_NORMAL_VALUES,v=weightedValue(values,campWeights(c,headline));return{name:(headline?CAMP_HEADLINE_NAMES:CAMP_NORMAL_NAMES)[String(v)],value:v,headline}}
+function applyCamp(){
+ S.campEvents=[];
+ for(const p of S.players){
+   let eligible=sh([...new Set([...asArray(p.active),...asArray(p.practice)])].map(card).filter(Boolean)).slice(0,5);
+   if(!eligible.length)continue;
+   let headlineIndex=ri(0,eligible.length-1);
+   eligible.forEach((c,i)=>{
+     let headline=i===headlineIndex,e=campRoll(c,headline),current=persistentModTotal(c),applied=clamp(current+e.value,-15,15)-current;
+     if(!c.mods)c.mods=[];
+     if(applied)c.mods.push({value:applied,remaining:2,source:headline?"CAMP_HEADLINE":"CAMP"});
+     S.campEvents.push({playerId:p.id,playerName:p.name,uid:c.uid,pos:c.pos,rank:c.rank,type:traitLabel(c),age:c.age,name:e.name,value:applied,rolled:e.value,headline})
+   })
+ }
+}
+function campScreen(){let ev=asArray(S.campEvents);return`<div class=panel><div class=stage>SEASON ${S.room.season} — TRAINING CAMP</div><div class=title>ABILITY CHANGE ×5</div><div class=notice>各TEAM 5選手：<b>通常EVENT ×4 ＋ HEADLINE EVENT ×1</b>。TYPEで変動傾向が変化します。王道＝安定 / 晩成＝後半ほど上振れ / 即戦力＝ROOKIE期に上振れ / 一発屋＝大幅変動しやすい。Camp補正合計は±15まで・最大2Season継続。</div></div><div class=panel>${S.players.map(p=>`<div class=historyRound><div class=stage>${p.name}</div>${ev.filter(e=>e.playerId===p.id).map(e=>`<div class="historyRow ${e.headline?"headlineEvent":""}"><div><span class="rank ${e.rank}">${e.rank}</span> ${e.pos}</div><div>${e.uid.split("-").slice(0,3).join("-")}<div class=type>${e.type||traitLabel(card(e.uid))}</div></div><div>${e.headline?'<span class=headlineTag>HEADLINE</span> ':""}${e.name}</div><div style="font-weight:900">${e.value>0?"+":""}${e.value}${e.value!==e.rolled?` <span class=type>(CAP)</span>`:""}</div></div>`).join("")}</div>`).join("")}<button class=big onclick=beginFinal()>能力変動を反映 → FINAL ROSTER</button></div>`}
+
+/* ---------- Playoff Form: temporary, postseason only ---------- */
+const PLAYOFF_FORM_EVENTS=[
+ {name:"FROZEN",value:-10,w:10},{name:"COLD",value:-5,w:15},{name:"OFF RHYTHM",value:-3,w:20},{name:"STEADY",value:0,w:10},{name:"SHARP",value:3,w:20},{name:"HOT",value:5,w:15},{name:"ON FIRE",value:10,w:10}
+];
+function playoffFormRoll(){let r=Math.random()*100,n=0;for(const e of PLAYOFF_FORM_EVENTS){n+=e.w;if(r<n)return e}return PLAYOFF_FORM_EVENTS[3]}
+function clearPlayoffForm(){for(const c of asArray(S.pool))if(c&&c.playoffForm)delete c.playoffForm}
+function beginPostseason(){
+ if(!allRegularDone())return;
+ clearPlayoffForm();
+ let st=regularStandings();S.regular.finalStandings=st;let n=S.players.length,k=n===4?2:n<=6?3:4,seeds=st.slice(0,k).map(x=>x.playerId);
+ S.postseason={seeds:[...seeds],qualifiers:[...seeds],formEvents:[],reorgQueue:[],reorgIndex:0,games:[],roundIndex:0,championId:null,runnerUpId:null};
+ for(const id of seeds){let p=teamById(id),elig=sh([...new Set([...asArray(p.active),...asArray(p.practice)])].map(card).filter(Boolean));for(let i=0;i<2&&elig.length;i++){let c=elig.shift(),e=playoffFormRoll();c.playoffForm={value:e.value,season:S.room.season,name:e.name};S.postseason.formEvents.push({playerId:id,playerName:p.name,uid:c.uid,pos:c.pos,rank:c.rank,type:traitLabel(c),name:e.name,value:e.value,rolled:e.value})}}
+ S.room.phase="playoff_form";save();render();topNow()
+}
+function playoffFormScreen(){return`<div class=panel><div class=stage>PLAYOFF QUALIFIERS</div><div class=title>PLAYOFF FORM ×2</div><div class=notice>進出TEAMのみACTIVE＋PRACTICEからランダム2人。<b>Playoff FormはこのPostseasonだけ有効</b>で、Season終了時に解除されます。Training Campの長期補正とは別枠。結果を見てACTIVE⇄PSを再編成できます。<b>FA補強は禁止。</b></div><div class=order>${asArray(S.postseason.seeds).map((id,i)=>`<div class=chip>#${i+1} ${teamById(id).name}</div>`).join("")}</div></div><div class=panel>${asArray(S.postseason.seeds).map(id=>{let p=teamById(id);return`<div class=historyRound><div class=stage>${p.name}</div>${asArray(S.postseason.formEvents).filter(e=>e.playerId===id).map(e=>`<div class=formEvent><div><span class="rank ${e.rank}">${e.rank}</span> ${e.pos} ${e.uid.split("-").slice(0,3).join("-")} <span class=type>· ${e.type||traitLabel(card(e.uid))}</span> — ${e.name}</div><div style="font-weight:950">${e.value>0?"+":""}${e.value}</div></div>`).join("")}</div>`}).join("")}<button class=big onclick=beginPlayoffReorg()>PLAYOFF ROSTER REBUILD</button></div>`}
+function finalizeSeason(){
+ if(S.room.phase==="season_end")return;let gs=S.postseason.games||[],final=gs.find(g=>g.round==="CHAMPIONSHIP"&&g.status==="done");if(!final)return;
+ let champ=final.winnerId,runner=final.a===champ?final.b:final.a,reg=S.regular.finalStandings||regularStandings(),q=new Set(S.postseason.qualifiers),others=S.postseason.qualifiers.filter(id=>id!==champ&&id!==runner).sort((a,b)=>(reg.find(x=>x.playerId===a)?.rank||99)-(reg.find(x=>x.playerId===b)?.rank||99)),non=reg.filter(x=>!q.has(x.playerId)).map(x=>x.playerId),order=[champ,runner,...others,...non];
+ let result={season:S.room.season,championId:champ,runnerUpId:runner,regularStandings:reg,playoffGames:gs.map(g=>({...g})),standings:order.map((id,i)=>{let p=teamById(id),r=reg.find(x=>x.playerId===id),finish=id===champ?"CHAMPION":id===runner?"RUNNER-UP":q.has(id)?"PLAYOFF":"REGULAR";return{rank:i+1,playerId:id,playerName:p.name,cpu:p.cpu,power:power(p),activeCap:cap(p),totalCap:totalCap(p),starsBefore:p.stars||0,wins:r?.w||0,losses:r?.l||0,pf:r?.pf||0,pa:r?.pa||0,regularRank:r?.rank||0,playoff:finish}})};
+ S.resultsHistory.push(result);if(S.room.season<S.room.maxSeason){S.nextWaiver=[...order].reverse();S.waiverSnapshot={season:S.room.season,order:[...S.nextWaiver]}}else{S.nextWaiver=[];S.waiverSnapshot=null}
+ let cp=teamById(champ);cp.stars=(cp.stars||0)+1;S.postseason.championId=champ;S.postseason.runnerUpId=runner;
+ clearPlayoffForm();
+ S.room.phase="season_end";save();render();topNow()
+}
+
+/* ---------- ONLINE setup: maximum 4 simultaneous HUMAN devices ---------- */
+function homeScreen(){return`<div class=panel><div class=stage>PLAY CALL SERIES</div><div class=title>FRANCHISE MODE</div><div class=desc>Ver.0.6.0：2〜4人ONLINE、同時ROSTER BUILD、同時カード選択GAME DAY、選手TYPE・新Training Camp・短期Playoff Formを搭載。</div><div class=homeGrid><button class=homeChoice onclick=startLocalSetup()><b>📱 LOCAL PLAY</b><span>1端末でHUMAN / CPUを進行。新しい選手個性・Campも適用。</span></button><button class=homeChoice onclick=openOnlineHub()><b>🌐 ONLINE PLAY</b><span>ROOM CODEで最大4人のHUMANが各端末から参加。</span></button></div></div>`}
+function setup(){return`<div class=panel><div class=stage>FRANCHISE MODE</div><div class=title>NEW FRANCHISE</div><p class=desc>4〜8チーム。HUMAN / CPUを自由に設定。Season数は3 / 5 / 7。選手TYPE（王道 / 晩成 / 即戦力 / 一発屋）がTraining Camp傾向に影響。Campは通常4＋HEADLINE1、Playoff Formは2人・Postseason限定。DRAFT → ROSTER BUILD → TRAINING CAMP → FINAL ROSTER → REGULAR SEASON → PLAYOFF FORM → PLAYOFFS。</p><div class=setupgrid><div class=slot><label class=desc>SEASONS</label><select id=sc>${[3,5,7].map(n=>`<option value="${n}" ${n===7?"selected":""}>${n} SEASONS</option>`).join("")}</select></div><div class=slot><label class=desc>チーム数</label><select id=pc onchange=inputs()>${[4,5,6,7,8].map(n=>`<option>${n}</option>`).join("")}</select></div></div><div id=inputs class=setupgrid></div><button class=big onclick=start()>FRANCHISE START</button></div>`}
+function onlineSetupScreen(){return`<div class=panel><div class=stage>ONLINE — NEW FRANCHISE</div><div class=title>ROOM SETUP</div><p class=desc>4〜8チーム。ONLINEのHUMANは<b>2〜4人</b>。残りはCPUにできます。HOSTは最初のHUMAN TEAMを担当します。DRAFTは順番制、ドラフト後ROSTER BUILDとGAME DAYのカード選択は同時進行対応。</p><div class=setupgrid><div class=slot><label class=desc>SEASONS</label><select id=osc>${[3,5,7].map(n=>`<option value="${n}" ${n===7?"selected":""}>${n} SEASONS</option>`).join("")}</select></div><div class=slot><label class=desc>チーム数</label><select id=opc onchange=onlineInputs()>${[4,5,6,7,8].map(n=>`<option>${n}</option>`).join("")}</select></div></div><div id=oinputs class=setupgrid></div><button class=big onclick=createOnlineRoom()>ROOMを作成</button><button class=ghost style="width:100%;margin-top:9px" onclick=openOnlineHub()>← BACK</button></div>`}
+function onlineInputs(){let n=+(document.getElementById("opc")?.value||4),e=document.getElementById("oinputs");if(e)e.innerHTML=Array.from({length:n},(_,i)=>`<div class=slot><input id=op${i} value="${i===0?"PLAYER 1":i===1?"PLAYER 2":"CPU "+i}"><select id=ot${i} onchange="onlineRoleChanged(${i})"><option value=human ${i<2?"selected":""}>HUMAN</option><option value=cpu ${i>=2?"selected":""}>CPU</option></select></div>`).join("")}
+function onlineRoleChanged(i){let n=+(document.getElementById("opc")?.value||4),sel=document.getElementById("ot"+i),inp=document.getElementById("op"+i);if(!sel||!inp)return;let humans=0;for(let k=0;k<n;k++)if(document.getElementById("ot"+k)?.value==="human")humans++;if(humans>4){sel.value="cpu";alert("ONLINE同接HUMANは最大4人です。")}if(sel.value==="human"&&/^CPU \d+$/.test(inp.value.trim()))inp.value=`PLAYER ${i+1}`;if(sel.value==="cpu"&&/^PLAYER \d+$/.test(inp.value.trim()))inp.value=`CPU ${i}`}
+async function createOnlineRoom(){
+ if(!dbReady())return alert("Database URLが未設定です。");
+ let n=+document.getElementById("opc").value,maxSeason=+document.getElementById("osc").value,defs=Array.from({length:n},(_,i)=>({name:(document.getElementById("op"+i).value.trim()||`PLAYER ${i+1}`),cpu:document.getElementById("ot"+i).value==="cpu"})),humanCount=defs.filter(x=>!x.cpu).length;
+ if(humanCount<2)return alert("ONLINE PLAYはHUMANを2人以上にしてください。");
+ if(humanCount>4)return alert("Ver.0.6.0のONLINE同接HUMANは最大4人です。");
+ let rc="";try{for(let i=0;i<8;i++){rc=roomCode6();if(!(await dbGet(`rooms/${rc}`)))break}S=fresh();S.room.mode="online";S.room.id=rc;S.room.phase="online_lobby";S.room.maxSeason=maxSeason;S.players=defs.map((d,i)=>pl(i,d.name,d.cpu));let first=S.players.find(p=>!p.cpu);NET.roomCode=rc;NET.localPlayerId=first.id;NET.isHost=true;NET.connected=true;NET.members={[NET.deviceId]:{playerId:first.id,name:first.name,host:true,joinedAt:Date.now()}};NET.gameChoices={};netSave();S.room.syncRev=1;S.room.syncAt=Date.now();await dbPut(`rooms/${rc}`,{meta:{version:VERSION,hostDevice:NET.deviceId,createdAt:Date.now(),updatedAt:Date.now(),maxHumans:4},state:S,members:NET.members});saveLocal();startStreams();render();topNow()}catch(e){NET.connected=false;alert(`ROOM作成に失敗しました。\n${e.message}`)}
+}
+function onlineLobbyScreen(){let humans=S.players.filter(p=>!p.cpu),claimed=humans.filter(p=>memberForPlayer(p.id)).length,all=claimed===humans.length;return`<div class=panel><div class=stage>ONLINE LOBBY — ${claimed}/${humans.length} HUMAN CONNECTED</div><div class=title>ROOM CODE</div><div class=roomCode>${esc(NET.roomCode)}</div><div class=notice>最大4人のHUMAN端末が参加できます。コードを友達に共有し、各自が自分のHUMAN TEAMをSELECTしてください。</div><div class=onlineTeams>${S.players.map(p=>{if(p.cpu)return`<div class=onlineTeam><div><b>${esc(p.name)}</b><div class=type>CPU GM</div></div><span>🤖 CPU</span></div>`;let ent=memberForPlayer(p.id),dev=ent?.[0],m=ent?.[1],mine=NET.localPlayerId===p.id;return`<div class=onlineTeam><div><b>${esc(p.name)} ${mine?"— YOU":""}</b><div class=type>HUMAN</div></div>${m?`<div><span class=claimed>CONNECTED${m.host?" / HOST":""}</span>${NET.isHost&&!m.host?`<br><button class=miniBtn onclick="releaseOnlineTeam('${dev}')">RELEASE</button>`:""}</div>`:(NET.localPlayerId===null?`<button class=miniBtn onclick=claimOnlineTeam(${p.id})>SELECT</button>`:`<span class=open>WAITING</span>`)}</div>`}).join("")}</div>${NET.isHost?`<button class=big ${all?"":"disabled"} onclick=startOnlineFranchise()>${all?"ALL PLAYERS READY — START":"HUMAN参加待ち"}</button>`:`<div class=notice>${NET.localPlayerId===null?"空いているHUMAN TEAMを選択してください。":all?"全員参加済み。HOSTのSTARTを待っています。":"他のHUMAN PLAYERの参加を待っています。"}</div>`}<button class=ghost style="width:100%;margin-top:9px" onclick=leaveOnlineRoom()>ROOMから退出</button></div>`}
+
+/* ---------- Simultaneous ONLINE GAME DAY card selection ---------- */
+let GAME_CHOICE_QUEUE=Promise.resolve(),ONLINE_GD_RESOLVING=false;
+let LOCAL_GAME_DRAFT={key:"",selected:[],ready:false};
+function onlineGameSide(g){if(!g||!isOnline())return null;return NET.localPlayerId===g.aId?"A":NET.localPlayerId===g.bId?"B":null}
+function gameRoundKey(g){return String(g?.phase||"").startsWith("ot")?`ot${g.otRound}`:`q${g.quarter}`}
+function gameDraftKey(g,side){return`${g?.gameId||"game"}|${gameRoundKey(g)}|${side||"X"}|${NET.localPlayerId}`}
+function gameChoiceMap(){return NET.gameChoices&&typeof NET.gameChoices==="object"?NET.gameChoices:{}}
+function gameChoiceEntryForSide(g,side,map=gameChoiceMap()){let pid=side==="A"?g?.aId:g?.bId;return map?.[String(pid)]||map?.[pid]||null}
+function localGameDraft(g,side){let key=gameDraftKey(g,side);if(LOCAL_GAME_DRAFT.key!==key){let e=gameChoiceEntryForSide(g,side);LOCAL_GAME_DRAFT={key,selected:[...asArray(e?.selected)],ready:!!e?.ready}}return LOCAL_GAME_DRAFT}
+function resetLocalGameDraft(){LOCAL_GAME_DRAFT={key:"",selected:[],ready:false}}
+function currentGameChoicePath(g){return`rooms/${NET.roomCode}/gameChoices/${g.gameId}/${gameRoundKey(g)}`}
+function queueGameChoice(g,side,ready=false){
+ if(!isOnline()||!g||!side)return Promise.resolve();let d=localGameDraft(g,side),pid=side==="A"?g.aId:g.bId,entry={playerId:pid,side,selected:[...d.selected],ready:!!ready,updatedAt:Date.now(),deviceId:NET.deviceId};d.ready=!!ready;NET.gameChoices=gameChoiceMap();NET.gameChoices[String(pid)]=entry;let path=`${currentGameChoicePath(g)}/${pid}`;
+ GAME_CHOICE_QUEUE=GAME_CHOICE_QUEUE.catch(()=>{}).then(async()=>{try{await dbWriteRetry(()=>dbPut(path,entry),2);NET.connected=true;NET.lastError=""}catch(e){NET.lastError=e.message;renderNetBarOnly();throw e}});return GAME_CHOICE_QUEUE
+}
+function gdSelect(uid){
+ let g=S.gameDay;if(!g)return;
+ if(!isOnline()){let side=String(g.phase||"").endsWith("B")?"B":"A",sel=side==="A"?g.selectedA:g.selectedB,avail=gdAvailable(g,side);if(!avail.some(c=>c.uid===uid))return;let i=sel.indexOf(uid);if(i>=0)sel.splice(i,1);else if(sel.length<2)sel.push(uid);save();render();return}
+ if(g.phase!=="selectA")return;let side=onlineGameSide(g);if(!side)return;let d=localGameDraft(g,side);if(d.ready)return;let avail=gdAvailable(g,side);if(!avail.some(c=>c.uid===uid))return;let i=d.selected.indexOf(uid);if(i>=0)d.selected.splice(i,1);else if(d.selected.length<2)d.selected.push(uid);queueGameChoice(g,side,false);render()
+}
+async function gdLock(){
+ let g=S.gameDay;if(!g)return;
+ if(!isOnline()){if(g.phase==="selectA"){if(g.selectedA.length!==2)return alert("2枚選択してください。");if(g.controlB==="cpu"){g.selectedB=gdCpuChoose(g,"B").map(c=>c.uid);gdReveal()}else{g.phase="passB";save();render();topNow()}}else if(g.phase==="selectB"){if(g.selectedB.length!==2)return alert("2枚選択してください。");gdReveal()}return}
+ if(g.phase!=="selectA")return;let side=onlineGameSide(g);if(!side)return;let d=localGameDraft(g,side);if(d.ready)return;if(d.selected.length!==2)return alert("2枚選択してください。");try{await queueGameChoice(g,side,true);render();if(NET.isHost)await maybeResolveOnlineGameRound()}catch(e){alert(`カード確定の同期に失敗しました。\n${e.message}`)}
+}
+function gdSelectOT(uid){
+ let g=S.gameDay;if(!g)return;
+ if(!isOnline()){let side=String(g.phase||"").endsWith("B")?"B":"A",used=new Set(side==="A"?g.otUsedA:g.otUsedB),sel=side==="A"?g.selectedA:g.selectedB;if(used.has(uid))return;sel.splice(0,sel.length,uid);save();render();return}
+ if(g.phase!=="ot_selectA")return;let side=onlineGameSide(g);if(!side)return;let d=localGameDraft(g,side);if(d.ready)return;let used=new Set(asArray(side==="A"?g.otUsedA:g.otUsedB));if(used.has(uid))return;d.selected=[uid];queueGameChoice(g,side,false);render()
+}
+async function gdLockOT(){
+ let g=S.gameDay;if(!g)return;
+ if(!isOnline()){if(g.phase==="ot_selectA"){if(g.selectedA.length!==1)return alert("OTカードを1枚選択してください。");if(g.controlB==="cpu"){g.selectedB=[gdCpuOT(g,"B").uid];gdRevealOT()}else{g.phase="ot_passB";save();render();topNow()}}else if(g.phase==="ot_selectB"){if(g.selectedB.length!==1)return alert("OTカードを1枚選択してください。");gdRevealOT()}return}
+ if(g.phase!=="ot_selectA")return;let side=onlineGameSide(g);if(!side)return;let d=localGameDraft(g,side);if(d.ready)return;if(d.selected.length!==1)return alert("OTカードを1枚選択してください。");try{await queueGameChoice(g,side,true);render();if(NET.isHost)await maybeResolveOnlineGameRound()}catch(e){alert(`OTカード確定の同期に失敗しました。\n${e.message}`)}
+}
+function gdCardHTML(g,side,c){
+ let phase=String(g.phase||""),ot=phase.startsWith("ot"),used=asArray(ot?(side==="A"?g.otUsedA:g.otUsedB):gdUsed(g,side)),sel,isTurn;
+ if(isOnline()){let mine=onlineGameSide(g),d=mine===side?localGameDraft(g,side):null;sel=d?d.selected:[];isTurn=mine===side&&!d?.ready&&((!ot&&phase==="selectA")||(ot&&phase==="ot_selectA"))}
+ else{sel=asArray(side==="A"?g.selectedA:g.selectedB);isTurn=(side==="A"&&(phase==="selectA"||phase==="ot_selectA"))||(side==="B"&&(phase==="selectB"||phase==="ot_selectB"))}
+ let selected=sel.includes(c.uid),click=isTurn&&!used.includes(c.uid),effect=c.pos==="QB"?"INDIVIDUAL ×1.50":c.pos==="HC"?"PARTNER ×1.30":(c.pos==="OF"||c.pos==="DF")?"UNIT BOOST ×1.20 / 1 GAME":"BASE",fn=ot?"gdSelectOT":"gdSelect";
+ return`<div class="gdCard ${c.rank} ${used.includes(c.uid)?"used":""} ${selected?"selected":""} ${click?"selectable":""}" ${click?`onclick="${fn}('${c.uid}')"`:""}>${selected?"<div class=gdCheck>✓</div>":""}<div class=cardtop><div><div class=pos>${c.pos}</div><div><span class="rank ${c.rank}">${c.rank}</span> <b>${c.pos}</b></div><div class=type>${ot?"OT BASE / ADV ×1.20":effect}</div></div><div style=text-align:right><div class=pow>${ep(c)}</div><div class=type>${st(c).name} · ${traitLabel(c)}</div></div></div></div>`
+}
+function onlineGameReadyStrip(g){let a=gdTeam(g,"A"),b=gdTeam(g,"B"),ea=gameChoiceEntryForSide(g,"A"),eb=gameChoiceEntryForSide(g,"B"),status=(side,t,e)=>t?.cpu?"CPU READY":e?.ready?"✓ LOCKED":"SELECTING";return`<div class=readyStrip><span>${esc(a.name)} <b>${status("A",a,ea)}</b></span><span>${esc(b.name)} <b>${status("B",b,eb)}</b></span></div>`}
+function onlineGameWait(g,side){let mine=onlineGameSide(g);if(!mine)return`${gdScoreboard(g)}<div class=panel><div class=gdPass><div class=stage>ONLINE GAME DAY — LIVE</div><div class=waitIcon>👀</div><div class=title>${gdTeam(g,"A").name} vs ${gdTeam(g,"B").name}</div><div class=notice>現在のWEEKを進行中です。対戦PLAYERが同時にカードを選択しています。</div>${onlineGameReadyStrip(g)}</div></div>${gdLogHTML(g)}`;let opp=gdTeam(g,mine==="A"?"B":"A");return`${gdScoreboard(g)}<div class=panel><div class=gdPass><div class=stage>CARDS LOCKED</div><div class=waitIcon>🔒</div><div class=title>${opp.name} のLOCK待ち</div><div class=notice>あなたのカードは確定済みです。相手のカード内容は両者LOCKまで非公開です。</div>${onlineGameReadyStrip(g)}</div></div>${gdLogHTML(g)}`}
+function gameDayScreen(){
+ let g=S.gameDay;if(!g)return"";
+ if(!isOnline()&&(g.phase==="passB"||g.phase==="ot_passB")){let b=gdTeam(g,"B");return`${gdScoreboard(g)}<div class=panel><div class=gdPass><div class=stage>PASS & PLAY</div><div class=title>端末を ${b.name} に渡してください</div><div class=notice>先に選んだカードは非表示です。相手は公開済みUSEDカードと残りロスターだけを見て選択します。</div><button class=big onclick=gdPass()>${b.name} — SELECT START</button></div></div>`}
+ if(g.phase==="result"){let h=gdResultHTML(g);return isOnline()&&!canControlSide("A")?disableExactAction(h,"gdNext"):h}
+ if(g.phase==="ot_result"){let h=gdOTResultHTML(g);return isOnline()&&!canControlSide("A")?disableExactAction(h,"gdNextOT"):h}
+ if(g.phase==="complete"){let a=gdTeam(g,"A"),b=gdTeam(g,"B"),winner=g.scoreA>g.scoreB?a:b,h=`${gdScoreboard(g)}<div class="panel seasoncard"><div class=stage>FINAL</div><div class=title>${winner.name} WIN!</div><div style="font-size:34px;font-weight:950">${g.scoreA} - ${g.scoreB}</div><div class=notice>TEAM POWERは地力、GAME DAYは8枚をどう切るか。通常4QはQB / HC LINK / 1回限定UNIT / TEAM EDGE、同点なら四竦みOT。</div><button class=big onclick=gdReturn()>${g.context==="playoff"?"PLAYOFFSへ戻る":"REGULAR SEASONへ戻る"}</button></div>${gdLogHTML(g)}`;return isOnline()&&!canControlSide("A")?disableExactAction(h,"gdReturn"):h}
+ if(isOnline()){
+   let side=onlineGameSide(g),ot=String(g.phase||"").startsWith("ot");if(!side)return onlineGameWait(g,null);if((!ot&&g.phase!=="selectA")||(ot&&g.phase!=="ot_selectA"))return onlineGameWait(g,side);
+   let d=localGameDraft(g,side);if(d.ready)return onlineGameWait(g,side);
+   let team=gdTeam(g,side),opp=gdTeam(g,side==="A"?"B":"A"),need=ot?1:2,sel=d.selected;
+   return`${gdScoreboard(g)}${onlineGameReadyStrip(g)}<div class=panel><div class=stage>${ot?`OVERTIME ROUND ${g.otRound}`:`QUARTER ${g.quarter}`} — SIMULTANEOUS SELECT</div><div class=title>${team.name} — SELECT ${need}</div><div class=notice>${ot?"両者1枚を同時に選択してLOCK。相手カードは両者LOCKまで非公開。":"両者2枚を同時に選択してLOCK。先にLOCKした側は相手待ちになります。相手の選択カードは公開されません。"}</div><div class=summary><div class=metric><div class=k>SELECTED</div><div class=v>${sel.length}/${need}</div></div><div class=metric><div class=k>UNIT</div><div class=v style="font-size:10px">${gdUnitUsed(g,side)?"USED":"READY ×1.20"}</div></div><div class=metric><div class=k>QB</div><div class=v>×1.5</div></div><div class=metric><div class=k>HC LINK</div><div class=v>×1.3</div></div></div></div><div class=panel><div class=stage>YOUR ROSTER</div><div class=gdRosterGrid>${gdDisplayCards(g,side).map(c=>gdCardHTML(g,side,c)).join("")}</div><button class=big ${sel.length!==need?"disabled":""} onclick=${ot?"gdLockOT()":"gdLock()"}>${ot?"OT CARDをLOCK":"2枚をLOCK"}</button></div><div class=panel><div class=stage>OPPONENT — ${opp.name}</div>${gdOpponentGrid(g,side==="A"?"B":"A")}</div>${gdLogHTML(g)}`
+ }
+ let side=g.phase.endsWith("B")?"B":"A",team=gdTeam(g,side),opp=gdTeam(g,side==="A"?"B":"A"),ot=g.phase.startsWith("ot"),sel=side==="A"?g.selectedA:g.selectedB,need=ot?1:2;return`${gdScoreboard(g)}<div class=panel><div class=stage>${ot?`OVERTIME ROUND ${g.otRound}`:`QUARTER ${g.quarter}`}</div><div class=title>${team.name} — SELECT ${need}</div><div class=notice>${ot?"OTは通常補正・TEAM EDGEなし。QB→OF→HC→DF→QB の有利側だけ×1.20。先に2勝で+3。":"2枚を同時公開。UNIT BOOSTはOF+OF / DF+DFの最初の1回だけ。"}</div><div class=summary><div class=metric><div class=k>SELECTED</div><div class=v>${sel.length}/${need}</div></div><div class=metric><div class=k>UNIT</div><div class=v style="font-size:10px">${gdUnitUsed(g,side)?"USED":"READY ×1.20"}</div></div><div class=metric><div class=k>QB</div><div class=v>×1.5</div></div><div class=metric><div class=k>HC LINK</div><div class=v>×1.3</div></div></div></div><div class=panel><div class=stage>YOUR ROSTER</div><div class=gdRosterGrid>${gdDisplayCards(g,side).map(c=>gdCardHTML(g,side,c)).join("")}</div><button class=big ${sel.length!==need?"disabled":""} onclick=${ot?"gdLockOT()":"gdLock()"}>${ot?"OT CARDを確定":"2枚を確定 → PLAY"}</button></div><div class=panel><div class=stage>OPPONENT — ${opp.name}</div>${gdOpponentGrid(g,side==="A"?"B":"A")}</div>${gdLogHTML(g)}`
+}
+async function maybeResolveOnlineGameRound(){
+ if(!isOnline()||!NET.isHost||S.room.phase!=="game_day"||ONLINE_GD_RESOLVING)return;
+ ONLINE_GD_RESOLVING=true;
+ try{
+   let room=await dbGet(`rooms/${NET.roomCode}`);if(!room?.state)return;let state=normalizeRemoteState(room.state),g=state.gameDay;if(!g||state.room?.phase!=="game_day")return;
+   let ot=String(g.phase||"").startsWith("ot");if((!ot&&g.phase!=="selectA")||(ot&&g.phase!=="ot_selectA"))return;
+   let roundKey=gameRoundKey(g),map=room.gameChoices?.[g.gameId]?.[roundKey]||{},need=ot?1:2;
+   let ids={};
+   for(const side of ["A","B"]){let control=side==="A"?g.controlA:g.controlB,pid=side==="A"?g.aId:g.bId;if(control==="cpu"){let tmpS=S;S=state;try{ids[side]=ot?[gdCpuOT(g,side).uid]:gdCpuChoose(g,side).map(c=>c.uid)}finally{S=tmpS}}else{let e=map[String(pid)]||map[pid];if(!e?.ready||asArray(e.selected).length!==need)return;ids[side]=asArray(e.selected)}}
+   APPLYING_REMOTE=true;S=state;APPLYING_REMOTE=false;g=S.gameDay;g.selectedA=[...ids.A];g.selectedB=[...ids.B];
+   if(ot){let a=card(g.selectedA[0]),b=card(g.selectedB[0]);if(!a||!b)return;gdResolveOT(g,a,b);g.selectedA=[];g.selectedB=[];g.phase="ot_result"}
+   else{let a=g.selectedA.map(card).filter(Boolean),b=g.selectedB.map(card).filter(Boolean);if(a.length!==2||b.length!==2)return;gdResolveQuarter(g,a,b);g.selectedA=[];g.selectedB=[];g.phase="result"}
+   S.room.syncRev=(S.room.syncRev||0)+1;S.room.syncAt=Date.now();saveLocal();resetLocalGameDraft();NET.gameChoices={};render();topNow();await pushOnlineSnapshotNow(JSON.parse(JSON.stringify(S)),"game_day");try{await dbDelete(`rooms/${NET.roomCode}/gameChoices/${g.gameId}/${roundKey}`)}catch(e){console.warn("game choice cleanup",e)}
+ }catch(e){NET.lastError=e.message;console.error("game resolve",e);renderNetBarOnly()}
+ finally{ONLINE_GD_RESOLVING=false}
+}
+
+/* Load independent build/game-choice nodes alongside shared state. */
+async function refreshRemoteSnapshots(){
+ if(!NET.roomCode||!dbReady())return;
+ try{
+   let room=await dbGet(`rooms/${NET.roomCode}`);if(!room){if(!NET.isHost){clearOnlineSession();S=fresh();saveLocal();render();alert("オンラインROOMが終了しました。")}return}
+   NET.members=room.members||{};NET.connected=true;
+   if(room.state?.room?.phase==="build")NET.builds=(room.builds||{})[String(room.state.room.season)]||{};else NET.builds={};
+   let rg=room.state?.gameDay;if(room.state?.room?.phase==="game_day"&&rg){NET.gameChoices=room.gameChoices?.[rg.gameId]?.[String(rg.phase||"").startsWith("ot")?`ot${rg.otRound}`:`q${rg.quarter}`]||{}}else{NET.gameChoices={};resetLocalGameDraft()}
+   if(room.state)applyRemoteState(room.state);
+   if(S.room.phase==="build"){mergeOnlineBuildDrafts();saveLocal();render();if(NET.isHost)maybeFinalizeOnlineBuild()}
+   if(S.room.phase==="game_day"){render();if(NET.isHost)maybeResolveOnlineGameRound()}
+ }catch(e){NET.connected=false;NET.lastError=e.message;renderNetBarOnly()}
+}
+async function resumeOnline(){
+ if(!NET.roomCode||!dbReady())return;
+ try{
+   let room=await dbGet(`rooms/${NET.roomCode}`);if(!room){clearOnlineSession();return}
+   NET.members=room.members||{};let mine=NET.members[NET.deviceId];if(mine)NET.localPlayerId=mine.playerId??null;NET.connected=true;
+   if(room.state){APPLYING_REMOTE=true;S=normalizeRemoteState(room.state);NET.builds=S.room?.phase==="build"?((room.builds||{})[String(S.room.season)]||{}):{};let g=S.gameDay;NET.gameChoices=S.room?.phase==="game_day"&&g?(room.gameChoices?.[g.gameId]?.[gameRoundKey(g)]||{}):{};mergeOnlineBuildDrafts();saveLocal();APPLYING_REMOTE=false}
+   startStreams();render();if(S.room.phase==="build"&&NET.isHost)maybeFinalizeOnlineBuild();if(S.room.phase==="game_day"&&NET.isHost)maybeResolveOnlineGameRound()
+ }catch(e){NET.connected=false;NET.lastError=e.message;render()}
+}
+function clearOnlineSession(keepDb=true){closeStreams();let db=NET.dbUrl,dev=NET.deviceId;NET={dbUrl:keepDb?db:"",roomCode:"",deviceId:dev||deviceCode(),localPlayerId:null,isHost:false,connected:false,members:{},builds:{},gameChoices:{},lastError:""};resetLocalGameDraft();netSave()}
+
 function cpuLater(fn,ms){if(CPU_TIMER)clearTimeout(CPU_TIMER);CPU_TIMER=setTimeout(()=>{CPU_TIMER=null;fn()},ms)}
 async function forceOnlineRefresh(){try{await refreshRemoteSnapshots();topNow()}catch(e){alert(`同期再取得に失敗しました。\n${e.message}`)}}
 function resetGame(){if(isOnline())return leaveOnlineRoom();if(confirm("リセットしますか？")){S=fresh();S.room.phase="home";saveLocal();render()}}
@@ -1043,7 +1410,7 @@ function render(){
   else if(S.room.phase==="setup"){html=setup();setTimeout(inputs,0)}
   else if(S.room.phase==="lottery"){html=lotteryScreen();if(isOnline()&&!NET.isHost)html=disableExactAction(html,"startSeason1Draft")}
   else if(S.room.phase==="draft"){html=draft();if(cur()?.cpu&&hostCanCpu())cpuLater(cpuPick,350)}
-  else if(S.room.phase==="build"){html=build();if(S.players[S.rosterPlayer]?.cpu&&hostCanCpu())cpuLater(cpuBuildCurrent,450)}
+  else if(S.room.phase==="build"){html=build();if(!isOnline()&&S.players[S.rosterPlayer]?.cpu)cpuLater(cpuBuildCurrent,450)}
   else if(S.room.phase==="final"){html=finalScreen();if(fplayer()?.cpu&&hostCanCpu())cpuLater(cpuFinalCurrent,450)}
   else if(S.room.phase==="camp"){html=campScreen();if(isOnline()&&!NET.isHost)html=disableExactAction(html,"beginFinal")}
   else if(S.room.phase==="camp_reorg")html=campReorgOnlineScreen();
@@ -1053,7 +1420,7 @@ function render(){
   else if(S.room.phase==="playoff_reorg")html=playoffReorgOnlineScreen();
   else if(S.room.phase==="playoffs"){html=playoffScreen();let pg=pendingCpuPlayoff();if(pg&&hostCanCpu())cpuLater(()=>simLeagueGame("playoff",pg.id),420)}
   else if(S.room.phase==="season_end"){html=seasonEnd();if(isOnline()&&!NET.isHost)html=disableExactAction(html,"advance")}
-  else html=`<div class=panel><div class=seasoncard><div class=stage>VER.0.5.6 COMPLETE</div><div class=title>${S.room.maxSeason} SEASONS COMPLETE</div><div class=notice>最終ロスターはROSTERS、全Seasonの順位推移・Regular Season・Playoff ChampionはRESULTSから確認できます。</div><button class=ghost style="width:100%;margin-top:10px" onclick=goHome()>HOME</button></div></div>`;
+  else html=`<div class=panel><div class=seasoncard><div class=stage>VER.0.6.0 COMPLETE</div><div class=title>${S.room.maxSeason} SEASONS COMPLETE</div><div class=notice>最終ロスターはROSTERS、全Seasonの順位推移・Regular Season・Playoff ChampionはRESULTSから確認できます。</div><button class=ghost style="width:100%;margin-top:10px" onclick=goHome()>HOME</button></div></div>`;
   g.innerHTML=(isOnline()?networkBar():"")+html;
  }catch(e){
   console.error("RENDER ERROR",e);
