@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07101c">
-<title>PLAY CALL - FRANCHISE MODE Ver.0.5.2</title>
+<title>PLAY CALL - FRANCHISE MODE Ver.0.5.3</title>
 <style>
 :root{--panel:#0f1a29;--line:#2a3e56;--text:#f5f7fb;--muted:#9fb0c4;--gold:#d9ad4f;--green:#63d18f;--red:#ef7070}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -12%,#25456d 0,transparent 35%),linear-gradient(#08111f,#050a12);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI","Noto Sans JP",sans-serif;min-height:100vh}
@@ -42,11 +42,11 @@
 </style>
 </head>
 <body>
-<div class=app><div class=hero><div class=brand>PLAY CALL SERIES</div><h1>FRANCHISE <span>MODE</span></h1><div class=sub>Prototype Ver.0.5.2 — ONLINE MULTIPLAYER</div></div><div id=game></div></div>
+<div class=app><div class=hero><div class=brand>PLAY CALL SERIES</div><h1>FRANCHISE <span>MODE</span></h1><div class=sub>Prototype Ver.0.5.3 — ONLINE MULTIPLAYER</div></div><div id=game></div></div>
 <div class=bottom><div class=bottomin><button onclick=openLeague()>🏈 ROSTERS</button><button onclick=openHistory()>📜 DRAFT</button><button onclick=openResults()>🏆 RESULTS</button><button onclick=openFA()>🧾 FA</button><button onclick=resetGame()>↻ RESET</button></div></div>
 <div id=modal class=modal onclick="if(event.target===this)this.classList.remove('show')"><div class=sheet><div id=modalbody></div><button class=ghost style="width:100%;margin-top:10px" onclick="document.getElementById('modal').classList.remove('show')">閉じる</button></div></div>
 <script>
-const VERSION="0.5.2",KEY="pc_franchise_v0520";
+const VERSION="0.5.3",KEY="pc_franchise_v0530";
 const BASE_CAPS={1:100,2:115,3:125},NEED={HC:1,QB:1,OF:3,DF:3},POS=["HC","QB","OF","DF"];
 const COUNTS={QB:{S:3,A:9,B:10,C:8},HC:{S:3,A:9,B:10,C:8},OF:{S:9,A:27,B:30,C:24},DF:{S:9,A:27,B:30,C:24}};
 const RANGE={S:[90,99],A:[80,89],B:[70,79],C:[60,69]},RSAL={S:20,A:15,B:5,C:1},TYPES=[["王道",70],["晩成",15],["即戦力",10],["一発屋",5]];
@@ -810,7 +810,7 @@ function render(){
    Firebase Realtime Database REST + Server-Sent Events
    ========================================================= */
 const DEFAULT_DB_URL="https://play-call-franchise-default-rtdb.asia-southeast1.firebasedatabase.app";
-const NETKEY="pc_franchise_net_v0510";
+const NETKEY="pc_franchise_net_v0530";
 let APPLYING_REMOTE=false,REMOTE_QUEUE=Promise.resolve(),STATE_STREAM=null,MEMBER_STREAM=null,POLL_TIMER=null,CPU_TIMER=null;
 function deviceCode(){return"D-"+Math.random().toString(36).slice(2,10).toUpperCase()}
 function netLoad(){try{let n=JSON.parse(localStorage.getItem(NETKEY))||{};return{dbUrl:n.dbUrl||DEFAULT_DB_URL,roomCode:n.roomCode||"",deviceId:n.deviceId||deviceCode(),localPlayerId:n.localPlayerId??null,isHost:!!n.isHost,connected:false,members:{},lastError:""}}catch(e){return{dbUrl:DEFAULT_DB_URL,roomCode:"",deviceId:deviceCode(),localPlayerId:null,isHost:false,connected:false,members:{},lastError:""}}}
@@ -854,10 +854,10 @@ function streamStateEvent(ev){try{let x=JSON.parse(ev.data);if(x.path==="/"&&x.d
 function startStreams(){closeStreams();if(!NET.roomCode||!dbReady())return;try{STATE_STREAM=new EventSource(dbEndpoint(`rooms/${NET.roomCode}/state`));STATE_STREAM.addEventListener("put",streamStateEvent);STATE_STREAM.addEventListener("patch",streamStateEvent);STATE_STREAM.onopen=()=>{NET.connected=true;NET.lastError="";renderNetBarOnly()};STATE_STREAM.onerror=()=>{NET.lastError="LIVE STREAM unavailable — polling";renderNetBarOnly()};MEMBER_STREAM=new EventSource(dbEndpoint(`rooms/${NET.roomCode}/members`));let mem=()=>refreshMembers();MEMBER_STREAM.addEventListener("put",mem);MEMBER_STREAM.addEventListener("patch",mem)}catch(e){console.warn("SSE unavailable, polling remains active",e)}POLL_TIMER=setInterval(refreshRemoteSnapshots,1200)}
 async function resumeOnline(){if(!NET.roomCode||!dbReady())return;try{let room=await dbGet(`rooms/${NET.roomCode}`);if(!room){clearOnlineSession();return}NET.members=room.members||{};let mine=NET.members[NET.deviceId];if(mine)NET.localPlayerId=mine.playerId??null;NET.connected=true;if(room.state){APPLYING_REMOTE=true;S=room.state;saveLocal();APPLYING_REMOTE=false}startStreams();render()}catch(e){NET.connected=false;NET.lastError=e.message;render()}}
 function networkBar(){if(!isOnline())return"";let me=localTeam(),role=NET.isHost?'<span class=hostTag>HOST</span>':"";return`<div id=netbar class=netbar><span class="netdot ${NET.connected?"on":""}"></span><div><span class=netroom>ROOM ${esc(NET.roomCode)}</span> ${role}<div class=type>${NET.connected?"SYNC CONNECTED":"RECONNECTING / POLLING"}</div></div><div class=netme>${me?`YOU: ${esc(me.name)}`:"TEAM未選択"}</div></div>`}
-function homeScreen(){return`<div class=panel><div class=stage>PLAY CALL SERIES</div><div class=title>FRANCHISE MODE</div><div class=desc>Ver.0.5.2では従来のLOCAL PLAYに加え、友達とそれぞれの端末から同じFranchiseへ参加できます。</div><div class=homeGrid><button class=homeChoice onclick=startLocalSetup()><b>📱 LOCAL PLAY</b><span>従来どおり1端末でHUMAN / CPUを進行。</span></button><button class=homeChoice onclick=openOnlineHub()><b>🌐 ONLINE PLAY</b><span>ROOM CODEで接続。各HUMANが自分の端末から操作。</span></button></div></div>`}
+function homeScreen(){return`<div class=panel><div class=stage>PLAY CALL SERIES</div><div class=title>FRANCHISE MODE</div><div class=desc>Ver.0.5.3では従来のLOCAL PLAYに加え、友達とそれぞれの端末から同じFranchiseへ参加できます。</div><div class=homeGrid><button class=homeChoice onclick=startLocalSetup()><b>📱 LOCAL PLAY</b><span>従来どおり1端末でHUMAN / CPUを進行。</span></button><button class=homeChoice onclick=openOnlineHub()><b>🌐 ONLINE PLAY</b><span>ROOM CODEで接続。各HUMANが自分の端末から操作。</span></button></div></div>`}
 function startLocalSetup(){clearOnlineSession();S=fresh();S.room.mode="local";S.room.phase="setup";saveLocal();render();topNow()}
 function openOnlineHub(){clearOnlineSession();S=fresh();S.room.mode="local";S.room.phase="online_hub";saveLocal();render();topNow()}
-function onlineHubScreen(){NET.dbUrl=DEFAULT_DB_URL;netSave();return`<div class=panel><div class=stage>ONLINE MULTIPLAYER</div><div class=title>CONNECT</div><div class="notice success">ONLINE DATABASE READY<br><span class=type>接続先はVer.0.5.2に組み込み済みです。友達にはこのゲームURLとROOM CODEだけ共有してください。</span></div><button class=big onclick=goOnlineCreate()>CREATE ROOM</button><div style="height:8px"></div><div class=copyRow><input id=joincode maxlength=8 placeholder="ROOM CODE"><button class=ghost onclick=joinOnlineRoom()>JOIN</button></div><button class=ghost style="width:100%;margin-top:9px" onclick=goHome()>← HOME</button><div class=onlineHelp>商用向けのログイン・戦績保存・強固な不正対策はVer.0.5.2では未実装です。Firebase側のDatabase Rules設定が必要です。</div></div>`}
+function onlineHubScreen(){NET.dbUrl=DEFAULT_DB_URL;netSave();return`<div class=panel><div class=stage>ONLINE MULTIPLAYER</div><div class=title>CONNECT</div><div class="notice success">ONLINE DATABASE READY<br><span class=type>接続先はVer.0.5.3に組み込み済みです。友達にはこのゲームURLとROOM CODEだけ共有してください。</span></div><button class=big onclick=goOnlineCreate()>CREATE ROOM</button><div style="height:8px"></div><div class=copyRow><input id=joincode maxlength=8 placeholder="ROOM CODE"><button class=ghost onclick=joinOnlineRoom()>JOIN</button></div><button class=ghost style="width:100%;margin-top:9px" onclick=goHome()>← HOME</button><div class=onlineHelp>商用向けのログイン・戦績保存・強固な不正対策はVer.0.5.3では未実装です。Firebase側のDatabase Rules設定が必要です。</div></div>`}
 function readDbUrl(){let v=normalizeDbUrl(DEFAULT_DB_URL);NET.dbUrl=v;netSave();return v}
 function goOnlineCreate(){if(!readDbUrl())return;S=fresh();S.room.mode="online";S.room.phase="online_setup";saveLocal();render();setTimeout(onlineInputs,0);topNow()}
 function onlineSetupScreen(){return`<div class=panel><div class=stage>ONLINE — NEW FRANCHISE</div><div class=title>ROOM SETUP</div><p class=desc>4〜8チーム。ONLINEではHUMANを2人以上に設定してください。残りはCPUにできます。HOSTは最初のHUMAN TEAMを担当します。</p><div class=setupgrid><div class=slot><label class=desc>SEASONS</label><select id=osc>${[3,5,7].map(n=>`<option value="${n}" ${n===7?"selected":""}>${n} SEASONS</option>`).join("")}</select></div><div class=slot><label class=desc>チーム数</label><select id=opc onchange=onlineInputs()>${[4,5,6,7,8].map(n=>`<option>${n}</option>`).join("")}</select></div></div><div id=oinputs class=setupgrid></div><button class=big onclick=createOnlineRoom()>ROOMを作成</button><button class=ghost style="width:100%;margin-top:9px" onclick=openOnlineHub()>← BACK</button></div>`}
@@ -873,17 +873,27 @@ async function startOnlineFranchise(){
   if(!NET.isHost)return alert("HOSTのみ開始できます。");
   if(ONLINE_TRANSITION)return;
   ONLINE_TRANSITION=true;
-  const before=JSON.parse(JSON.stringify(S));
   try{
     NET.members=await dbGet(`rooms/${NET.roomCode}/members`)||{};
     let humans=S.players.filter(p=>!p.cpu);
-    if(humans.some(p=>!memberForPlayer(p.id)))return alert("まだ参加していないHUMAN TEAMがあります。");
-    S.pool=makePool();S.room.firstDraftOrder=sh(S.players.map(p=>p.id));S.room.phase="lottery";
-    await pushOnlineStateNow("lottery");
+    if(humans.some(p=>!memberForPlayer(p.id))){
+      alert("まだ参加していないHUMAN TEAMがあります。");
+      return;
+    }
+    S.pool=makePool();
+    S.room.firstDraftOrder=sh(S.players.map(p=>p.id));
+    S.room.phase="lottery";
+    // Publish the LOTTERY snapshot explicitly. Do not call the removed 0.5.2 helper.
+    S.room.syncRev=(S.room.syncRev||0)+1;
+    S.room.syncAt=Date.now();
+    saveLocal();
     render();topNow();
+    await pushOnlineSnapshotNow(JSON.parse(JSON.stringify(S)),"lottery");
   }catch(e){
-    S=before;saveLocal();NET.connected=false;NET.lastError=e.message;render();
-    alert(`FRANCHISE開始の同期に失敗しました。\n${e.message}`);
+    NET.lastError=e.message;
+    renderNetBarOnly();
+    alert(`LOTTERY画面には進みましたが、Firebase同期を再試行しています。\n${e.message}`);
+    queueRemoteState();
   }finally{ONLINE_TRANSITION=false}
 }
 async function leaveOnlineRoom(){if(!isOnline())return goHome();if(NET.isHost){if(!confirm("ROOMを終了しますか？ 参加者全員のオンラインセッションが終了します。"))return;try{await dbDelete(`rooms/${NET.roomCode}`)}catch(e){console.warn(e)}clearOnlineSession();S=fresh();saveLocal();render();return}if(!confirm("このROOMから退出しますか？"))return;try{await dbDelete(`rooms/${NET.roomCode}/members/${NET.deviceId}`)}catch(e){console.warn(e)}clearOnlineSession();S=fresh();saveLocal();render()}
