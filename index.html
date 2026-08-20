@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07101c">
-<title>PLAY CALL - FRANCHISE MODE Ver.0.6.0</title>
+<title>PLAY CALL - FRANCHISE MODE Ver.0.6.1</title>
 <style>
 :root{--panel:#0f1a29;--line:#2a3e56;--text:#f5f7fb;--muted:#9fb0c4;--gold:#d9ad4f;--green:#63d18f;--red:#ef7070}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -12%,#25456d 0,transparent 35%),linear-gradient(#08111f,#050a12);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI","Noto Sans JP",sans-serif;min-height:100vh}
@@ -40,16 +40,16 @@
 @media(max-width:580px){.homeGrid{grid-template-columns:1fr}.netbar{grid-template-columns:auto 1fr}.netme{grid-column:2;text-align:left}.onlineTeam{grid-template-columns:1fr auto}}
 
 
-/* Ver.0.6.0 */
-.headlineEvent{background:linear-gradient(90deg,rgba(217,173,79,.10),transparent);border-left:2px solid var(--gold);padding-left:6px}.headlineTag{display:inline-block;border:1px solid var(--gold);color:#ffe3a0;border-radius:99px;padding:2px 5px;font-size:8px;font-weight:950;letter-spacing:.05em}.readyStrip{display:flex;justify-content:space-between;gap:8px;margin:8px 0;padding:8px 10px;border:1px solid #2b4058;border-radius:11px;background:#08131f;color:#aebdca;font-size:9px}.readyStrip b{color:#ffe3a0}
+/* Ver.0.6.1 */
+.headlineEvent{background:linear-gradient(90deg,rgba(217,173,79,.10),transparent);border-left:2px solid var(--gold);padding-left:6px}.headlineTag{display:inline-block;border:1px solid var(--gold);color:#ffe3a0;border-radius:99px;padding:2px 5px;font-size:8px;font-weight:950;letter-spacing:.05em;white-space:nowrap}.headlineText{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}.headlineName{font-weight:850;line-height:1.15}.seasonResultCard .cardtop>div:first-child{min-width:0}.seasonResultRight{text-align:right;flex:0 0 auto;min-width:116px}.seasonResultCap{white-space:nowrap;font-size:10px;line-height:1.4}.readyStrip{display:flex;justify-content:space-between;gap:8px;margin:8px 0;padding:8px 10px;border:1px solid #2b4058;border-radius:11px;background:#08131f;color:#aebdca;font-size:9px}.readyStrip b{color:#ffe3a0}
 </style>
 </head>
 <body>
-<div class=app><div class=hero><div class=brand>PLAY CALL SERIES</div><h1>FRANCHISE <span>MODE</span></h1><div class=sub>Prototype Ver.0.6.0 — ONLINE MULTIPLAYER</div></div><div id=game></div></div>
+<div class=app><div class=hero><div class=brand>PLAY CALL SERIES</div><h1>FRANCHISE <span>MODE</span></h1><div class=sub>Prototype Ver.0.6.1 — ONLINE MULTIPLAYER</div></div><div id=game></div></div>
 <div class=bottom><div class=bottomin><button onclick=openLeague()>🏈 ROSTERS</button><button onclick=openHistory()>📜 DRAFT</button><button onclick=openResults()>🏆 RESULTS</button><button onclick=openFA()>🧾 FA</button><button onclick=resetGame()>↻ RESET</button></div></div>
 <div id=modal class=modal onclick="if(event.target===this)this.classList.remove('show')"><div class=sheet><div id=modalbody></div><button class=ghost style="width:100%;margin-top:10px" onclick="document.getElementById('modal').classList.remove('show')">閉じる</button></div></div>
 <script>
-const VERSION="0.6.0",KEY="pc_franchise_v0600";
+const VERSION="0.6.1",KEY="pc_franchise_v0610";
 const BASE_CAPS={1:100,2:115,3:125},NEED={HC:1,QB:1,OF:3,DF:3},POS=["HC","QB","OF","DF"];
 const COUNTS={QB:{S:3,A:9,B:10,C:8},HC:{S:3,A:9,B:10,C:8},OF:{S:9,A:27,B:30,C:24},DF:{S:9,A:27,B:30,C:24}};
 const RANGE={S:[90,99],A:[80,89],B:[70,79],C:[60,69]},RSAL={S:20,A:15,B:5,C:1},TYPES=[["王道",70],["晩成",15],["即戦力",10],["一発屋",5]];
@@ -64,7 +64,8 @@ function salary(rank,p,stage){
  // Ver.0.3.0: stage/rank bands never overlap, so a stronger rank cannot become cheaper at the boundary.
  const bands={
    2:{C:[1,10],B:[11,20],A:[21,30],S:[31,40]},
-   3:{C:[5,14],B:[15,24],A:[25,34],S:[35,45]}
+   // Ver.0.6.1: LEGEND is a veteran-value contract tier.
+   3:{C:[3,9],B:[10,16],A:[17,24],S:[25,34]}
  };
  const rr=bands[stage][rank];
  const pr=rank==="S"?(stage===2?[92,108]:[95,115]):RANGE[rank];
@@ -717,7 +718,7 @@ function finalScreen(){
 
 function seasonEnd(){
  let s=S.room.season,n=s+1,result=(S.resultsHistory||[]).find(r=>r.season===s);if(!result)return`<div class=panel><div class=title>RESULT NOT READY</div></div>`;if(s<S.room.maxSeason)ensureFutureCap(n);let wv=(S.waiverSnapshot&&S.waiverSnapshot.season===s)?S.waiverSnapshot.order:[],byId=id=>teamById(id),champ=byId(result.championId);
- return`<div class=panel><div class=seasoncard><div class=stage>SEASON ${s} COMPLETE</div><div class=title>${champ?.name||"TEAM"} ⭐ CHAMPION</div><div class=notice>Regular Season約3試合 → Playoff Form → PlayoffsでSeason Championを決定。優勝⭐BONUS +10は<b>次Seasonから</b>有効。次Seasonドラフト順はSeason最終順位の逆順。</div></div></div><div class=panel>${result.standings.map(r=>{let p=byId(r.playerId),titles=titleCountAt(result,r);return`<div class=card style="margin-top:7px"><div class=cardtop><div><b>${r.rank}. ${r.playerName}${r.cpu?" 🤖":""}${r.playerId===result.championId?" ⭐":""}</b><div class=type>REG ${r.wins}-${r.losses} / ${r.playoff} / TITLES ${titles?`⭐${titles}`:"—"}</div></div><div style=text-align:right><div class=pow>${r.power}</div><div class=sal>ACTIVE $${r.activeCap}/${capLimit(s)}<br>TOTAL $${r.totalCap}/${capLimit(s)+30}</div></div></div></div>`}).join("")}</div>${s<S.room.maxSeason?`<div class=panel><div class=stage>SEASON ${n} INFORMATION</div><div class=title>ACTIVE CAP $${capLimit(n)} / TOTAL $${capLimit(n)+30}</div><div class=notice>${n>=4?"Season 4以降のCAPは$125〜150でランダム決定。":""} 次Seasonドラフト：${eligiblePos(n)[0]} / OF / DF。優勝⭐BONUSはSeason ${n}から反映。</div><div class=order>${wv.map((id,i)=>`<div class=chip>${i+1}. ${byId(id)?.name||"TEAM"}</div>`).join("")}</div><button class=big onclick=advance()>SEASON ${n}へ進む</button></div>`:`<div class=panel><div class="notice success">${S.room.maxSeason} SEASONS COMPLETE</div><div class=title>FRANCHISE MODE COMPLETE</div><div class=notice>全Seasonの順位推移・Regular Season成績・Playoff Championは🏆 RESULTSから確認できます。</div><button class=big onclick=advance()>COMPLETE</button></div>`}`
+ return`<div class=panel><div class=seasoncard><div class=stage>SEASON ${s} COMPLETE</div><div class=title>${champ?.name||"TEAM"} ⭐ CHAMPION</div><div class=notice>Regular Season約3試合 → Playoff Form → PlayoffsでSeason Championを決定。優勝⭐BONUS +10は<b>次Seasonから</b>有効。次Seasonドラフト順はSeason最終順位の逆順。</div></div></div><div class=panel>${result.standings.map(r=>{let p=byId(r.playerId),titles=titleCountAt(result,r);return`<div class="card seasonResultCard" style="margin-top:7px"><div class=cardtop><div><b>${r.rank}. ${r.playerName}${r.cpu?" 🤖":""}${r.playerId===result.championId?" ⭐":""}</b><div class=type>REG ${r.wins}-${r.losses} / ${r.playoff} / TITLES ${titles?`⭐${titles}`:"—"}</div></div><div class=seasonResultRight><div class=pow>${r.power}</div><div class="sal seasonResultCap">ACTIVE $${r.activeCap}/${capLimit(s)}<br>TOTAL $${r.totalCap}/${capLimit(s)+30}</div></div></div></div>`}).join("")}</div>${s<S.room.maxSeason?`<div class=panel><div class=stage>SEASON ${n} INFORMATION</div><div class=title>ACTIVE CAP $${capLimit(n)} / TOTAL $${capLimit(n)+30}</div><div class=notice>${n>=4?"Season 4以降のCAPは$125〜150でランダム決定。":""} 次Seasonドラフト：${eligiblePos(n)[0]} / OF / DF。優勝⭐BONUSはSeason ${n}から反映。</div><div class=order>${wv.map((id,i)=>`<div class=chip>${i+1}. ${byId(id)?.name||"TEAM"}</div>`).join("")}</div><button class=big onclick=advance()>SEASON ${n}へ進む</button></div>`:`<div class=panel><div class="notice success">${S.room.maxSeason} SEASONS COMPLETE</div><div class=title>FRANCHISE MODE COMPLETE</div><div class=notice>全Seasonの順位推移・Regular Season成績・Playoff Championは🏆 RESULTSから確認できます。</div><button class=big onclick=advance()>COMPLETE</button></div>`}`
 }
 
 function compactCard(c){let x=st(c);return`<div class="compactCard ${c.rank}"><div><div class=pos>${c.pos}</div><div class=nm><span class="rank ${c.rank}">${c.rank}</span> ${c.pos}</div><div class=stg>${x.name}</div></div><div class=r><div class=pow>${ep(c)}${modTotal(c)?` <span style="font-size:11px">(${modTotal(c)>0?"+":""}${modTotal(c)})</span>`:""}</div><div class=sal>$${x.salary}</div></div></div>`}
@@ -814,7 +815,7 @@ function render(){
    Firebase Realtime Database REST + Server-Sent Events
    ========================================================= */
 const DEFAULT_DB_URL="https://play-call-franchise-default-rtdb.asia-southeast1.firebasedatabase.app";
-const NETKEY="pc_franchise_net_v0600";
+const NETKEY="pc_franchise_net_v0610";
 let APPLYING_REMOTE=false,REMOTE_QUEUE=Promise.resolve(),STATE_STREAM=null,MEMBER_STREAM=null,POLL_TIMER=null,CPU_TIMER=null;
 function deviceCode(){return"D-"+Math.random().toString(36).slice(2,10).toUpperCase()}
 function netLoad(){try{let n=JSON.parse(localStorage.getItem(NETKEY))||{};return{dbUrl:n.dbUrl||DEFAULT_DB_URL,roomCode:n.roomCode||"",deviceId:n.deviceId||deviceCode(),localPlayerId:n.localPlayerId??null,isHost:!!n.isHost,connected:false,members:{},lastError:""}}catch(e){return{dbUrl:DEFAULT_DB_URL,roomCode:"",deviceId:deviceCode(),localPlayerId:null,isHost:false,connected:false,members:{},lastError:""}}}
@@ -879,10 +880,10 @@ function streamStateEvent(ev){try{let x=JSON.parse(ev.data);if(x.path==="/"&&x.d
 function startStreams(){closeStreams();if(!NET.roomCode||!dbReady())return;try{STATE_STREAM=new EventSource(dbEndpoint(`rooms/${NET.roomCode}/state`));STATE_STREAM.addEventListener("put",streamStateEvent);STATE_STREAM.addEventListener("patch",streamStateEvent);STATE_STREAM.onopen=()=>{NET.connected=true;NET.lastError="";renderNetBarOnly()};STATE_STREAM.onerror=()=>{NET.lastError="LIVE STREAM unavailable — polling";renderNetBarOnly()};MEMBER_STREAM=new EventSource(dbEndpoint(`rooms/${NET.roomCode}/members`));let mem=()=>refreshMembers();MEMBER_STREAM.addEventListener("put",mem);MEMBER_STREAM.addEventListener("patch",mem)}catch(e){console.warn("SSE unavailable, polling remains active",e)}POLL_TIMER=setInterval(refreshRemoteSnapshots,1200)}
 async function resumeOnline(){if(!NET.roomCode||!dbReady())return;try{let room=await dbGet(`rooms/${NET.roomCode}`);if(!room){clearOnlineSession();return}NET.members=room.members||{};let mine=NET.members[NET.deviceId];if(mine)NET.localPlayerId=mine.playerId??null;NET.connected=true;if(room.state){APPLYING_REMOTE=true;S=normalizeRemoteState(room.state);saveLocal();APPLYING_REMOTE=false}startStreams();render()}catch(e){NET.connected=false;NET.lastError=e.message;render()}}
 function networkBar(){if(!isOnline())return"";let me=localTeam(),role=NET.isHost?'<span class=hostTag>HOST</span>':"";return`<div id=netbar class=netbar><span class="netdot ${NET.connected?"on":""}"></span><div><span class=netroom>ROOM ${esc(NET.roomCode)}</span> ${role}<div class=type>${NET.connected?"SYNC CONNECTED":"RECONNECTING / POLLING"}</div></div><div class=netme>${me?`YOU: ${esc(me.name)}`:"TEAM未選択"}</div></div>`}
-function homeScreen(){return`<div class=panel><div class=stage>PLAY CALL SERIES</div><div class=title>FRANCHISE MODE</div><div class=desc>Ver.0.6.0では従来のLOCAL PLAYに加え、友達とそれぞれの端末から同じFranchiseへ参加できます。</div><div class=homeGrid><button class=homeChoice onclick=startLocalSetup()><b>📱 LOCAL PLAY</b><span>従来どおり1端末でHUMAN / CPUを進行。</span></button><button class=homeChoice onclick=openOnlineHub()><b>🌐 ONLINE PLAY</b><span>ROOM CODEで接続。各HUMANが自分の端末から操作。</span></button></div></div>`}
+function homeScreen(){return`<div class=panel><div class=stage>PLAY CALL SERIES</div><div class=title>FRANCHISE MODE</div><div class=desc>Ver.0.6.1では従来のLOCAL PLAYに加え、友達とそれぞれの端末から同じFranchiseへ参加できます。</div><div class=homeGrid><button class=homeChoice onclick=startLocalSetup()><b>📱 LOCAL PLAY</b><span>従来どおり1端末でHUMAN / CPUを進行。</span></button><button class=homeChoice onclick=openOnlineHub()><b>🌐 ONLINE PLAY</b><span>ROOM CODEで接続。各HUMANが自分の端末から操作。</span></button></div></div>`}
 function startLocalSetup(){clearOnlineSession();S=fresh();S.room.mode="local";S.room.phase="setup";saveLocal();render();topNow()}
 function openOnlineHub(){clearOnlineSession();S=fresh();S.room.mode="local";S.room.phase="online_hub";saveLocal();render();topNow()}
-function onlineHubScreen(){NET.dbUrl=DEFAULT_DB_URL;netSave();return`<div class=panel><div class=stage>ONLINE MULTIPLAYER</div><div class=title>CONNECT</div><div class="notice success">ONLINE DATABASE READY<br><span class=type>接続先はVer.0.6.0に組み込み済みです。友達にはこのゲームURLとROOM CODEだけ共有してください。</span></div><button class=big onclick=goOnlineCreate()>CREATE ROOM</button><div style="height:8px"></div><div class=copyRow><input id=joincode maxlength=8 placeholder="ROOM CODE"><button class=ghost onclick=joinOnlineRoom()>JOIN</button></div><button class=ghost style="width:100%;margin-top:9px" onclick=goHome()>← HOME</button><div class=onlineHelp>商用向けのログイン・戦績保存・強固な不正対策はVer.0.6.0では未実装です。Firebase側のDatabase Rules設定が必要です。</div></div>`}
+function onlineHubScreen(){NET.dbUrl=DEFAULT_DB_URL;netSave();return`<div class=panel><div class=stage>ONLINE MULTIPLAYER</div><div class=title>CONNECT</div><div class="notice success">ONLINE DATABASE READY<br><span class=type>接続先はVer.0.6.1に組み込み済みです。友達にはこのゲームURLとROOM CODEだけ共有してください。</span></div><button class=big onclick=goOnlineCreate()>CREATE ROOM</button><div style="height:8px"></div><div class=copyRow><input id=joincode maxlength=8 placeholder="ROOM CODE"><button class=ghost onclick=joinOnlineRoom()>JOIN</button></div><button class=ghost style="width:100%;margin-top:9px" onclick=goHome()>← HOME</button><div class=onlineHelp>商用向けのログイン・戦績保存・強固な不正対策はVer.0.6.1では未実装です。Firebase側のDatabase Rules設定が必要です。</div></div>`}
 function readDbUrl(){let v=normalizeDbUrl(DEFAULT_DB_URL);NET.dbUrl=v;netSave();return v}
 function goOnlineCreate(){if(!readDbUrl())return;S=fresh();S.room.mode="online";S.room.phase="online_setup";saveLocal();render();setTimeout(onlineInputs,0);topNow()}
 function onlineSetupScreen(){return`<div class=panel><div class=stage>ONLINE — NEW FRANCHISE</div><div class=title>ROOM SETUP</div><p class=desc>4〜8チーム。ONLINEではHUMANを2人以上に設定してください。残りはCPUにできます。HOSTは最初のHUMAN TEAMを担当します。</p><div class=setupgrid><div class=slot><label class=desc>SEASONS</label><select id=osc>${[3,5,7].map(n=>`<option value="${n}" ${n===7?"selected":""}>${n} SEASONS</option>`).join("")}</select></div><div class=slot><label class=desc>チーム数</label><select id=opc onchange=onlineInputs()>${[4,5,6,7,8].map(n=>`<option>${n}</option>`).join("")}</select></div></div><div id=oinputs class=setupgrid></div><button class=big onclick=createOnlineRoom()>ROOMを作成</button><button class=ghost style="width:100%;margin-top:9px" onclick=openOnlineHub()>← BACK</button></div>`}
@@ -961,7 +962,7 @@ function gameDayScreen(){let g=S.gameDay;if(!g)return"";if(!isOnline()&&(g.phase
 
 
 /* =========================
-   Ver.0.6.0 — ORDERED GAME DAY
+   Ver.0.6.1 — ORDERED GAME DAY
    Regular Season games are processed strictly from the top of the schedule.
    The first pending game is the only unlocked WEEK on every device.
    ========================= */
@@ -1034,7 +1035,7 @@ function gdScoreboard(g){
 
 
 /* =========================
-   Ver.0.6.0 — SIMULTANEOUS ONLINE ROSTER BUILD
+   Ver.0.6.1 — SIMULTANEOUS ONLINE ROSTER BUILD
    Draft order stays sequential. The first post-draft ROSTER BUILD is parallel for HUMAN teams.
    FINAL ROSTER / FA remains waiver-order sequential because the FA pool is shared.
    Each HUMAN build is stored under rooms/{ROOM}/builds/{season}/{playerId}, so simultaneous
@@ -1196,13 +1197,14 @@ function gdOTResultHTML(g){let L=g.last,a=gdTeam(g,"A"),b=gdTeam(g,"B"),ac=card(
 
 
 /* =========================================================
-   Ver.0.6.0 — MULTIPLAYER + PLAYER IDENTITY UPDATE
-   - ONLINE: 2–4 HUMAN devices in one Franchise
+   Ver.0.6.1 — MULTIPLAYER + PLAYER IDENTITY UPDATE
+   - ONLINE: 2–8 HUMAN devices in one Franchise
    - Draft stays sequential / first ROSTER BUILD stays simultaneous
    - GAME DAY card selection is simultaneous for both HUMAN teams
    - Player TYPE is visible and affects Training Camp behavior
    - Camp: 4 normal events + 1 HEADLINE EVENT per team
    - Playoff Form: 2 players, postseason-only temporary modifier
+   - ONLINE HUMAN expanded to 8; LEGEND salary reduced; mobile UI refined
    ========================================================= */
 
 /* ---------- Player TYPE / compact UI ---------- */
@@ -1224,7 +1226,7 @@ function openHistory(){let body=document.getElementById("modalbody"),seasons=[..
 const CAMP_NORMAL_VALUES=[-5,-3,0,3,5];
 const CAMP_HEADLINE_VALUES=[-15,-10,-5,0,5,10,15];
 const CAMP_NORMAL_NAMES={"-5":"SLUMP","-3":"ROUGH CAMP","0":"STEADY","3":"GOOD CAMP","5":"GROWTH"};
-const CAMP_HEADLINE_NAMES={"-15":"COLLAPSE","-10":"MAJOR SLUMP","-5":"SETBACK","0":"SPOTLIGHT STEADY","5":"BIG STEP","10":"BREAKOUT","15":"MEGA BREAKOUT"};
+const CAMP_HEADLINE_NAMES={"-15":"COLLAPSE","-10":"MAJOR SLUMP","-5":"SETBACK","0":"STEADY","5":"BIG STEP","10":"BREAKOUT","15":"MEGA BREAKOUT"};
 function campWeights(c,headline=false){
  let t=traitLabel(c),age=c?.age||1;
  if(!headline){
@@ -1254,7 +1256,7 @@ function applyCamp(){
    })
  }
 }
-function campScreen(){let ev=asArray(S.campEvents);return`<div class=panel><div class=stage>SEASON ${S.room.season} — TRAINING CAMP</div><div class=title>ABILITY CHANGE ×5</div><div class=notice>各TEAM 5選手：<b>通常EVENT ×4 ＋ HEADLINE EVENT ×1</b>。TYPEで変動傾向が変化します。王道＝安定 / 晩成＝後半ほど上振れ / 即戦力＝ROOKIE期に上振れ / 一発屋＝大幅変動しやすい。Camp補正合計は±15まで・最大2Season継続。</div></div><div class=panel>${S.players.map(p=>`<div class=historyRound><div class=stage>${p.name}</div>${ev.filter(e=>e.playerId===p.id).map(e=>`<div class="historyRow ${e.headline?"headlineEvent":""}"><div><span class="rank ${e.rank}">${e.rank}</span> ${e.pos}</div><div>${e.uid.split("-").slice(0,3).join("-")}<div class=type>${e.type||traitLabel(card(e.uid))}</div></div><div>${e.headline?'<span class=headlineTag>HEADLINE</span> ':""}${e.name}</div><div style="font-weight:900">${e.value>0?"+":""}${e.value}${e.value!==e.rolled?` <span class=type>(CAP)</span>`:""}</div></div>`).join("")}</div>`).join("")}<button class=big onclick=beginFinal()>能力変動を反映 → FINAL ROSTER</button></div>`}
+function campScreen(){let ev=asArray(S.campEvents);return`<div class=panel><div class=stage>SEASON ${S.room.season} — TRAINING CAMP</div><div class=title>ABILITY CHANGE ×5</div><div class=notice>各TEAM 5選手：<b>通常EVENT ×4 ＋ HEADLINE EVENT ×1</b>。TYPEで変動傾向が変化します。王道＝安定 / 晩成＝後半ほど上振れ / 即戦力＝ROOKIE期に上振れ / 一発屋＝大幅変動しやすい。Camp補正合計は±15まで・最大2Season継続。</div></div><div class=panel>${S.players.map(p=>`<div class=historyRound><div class=stage>${p.name}</div>${ev.filter(e=>e.playerId===p.id).map(e=>`<div class="historyRow ${e.headline?"headlineEvent":""}"><div><span class="rank ${e.rank}">${e.rank}</span> ${e.pos}</div><div>${e.uid.split("-").slice(0,3).join("-")}<div class=type>${e.type||traitLabel(card(e.uid))}</div></div><div>${e.headline?`<div class=headlineText><span class=headlineTag>HEADLINE</span><div class=headlineName>${e.name}</div></div>`:e.name}</div><div style="font-weight:900">${e.value>0?"+":""}${e.value}${e.value!==e.rolled?` <span class=type>(CAP)</span>`:""}</div></div>`).join("")}</div>`).join("")}<button class=big onclick=beginFinal()>能力変動を反映 → FINAL ROSTER</button></div>`}
 
 /* ---------- Playoff Form: temporary, postseason only ---------- */
 const PLAYOFF_FORM_EVENTS=[
@@ -1281,20 +1283,20 @@ function finalizeSeason(){
  S.room.phase="season_end";save();render();topNow()
 }
 
-/* ---------- ONLINE setup: maximum 4 simultaneous HUMAN devices ---------- */
-function homeScreen(){return`<div class=panel><div class=stage>PLAY CALL SERIES</div><div class=title>FRANCHISE MODE</div><div class=desc>Ver.0.6.0：2〜4人ONLINE、同時ROSTER BUILD、同時カード選択GAME DAY、選手TYPE・新Training Camp・短期Playoff Formを搭載。</div><div class=homeGrid><button class=homeChoice onclick=startLocalSetup()><b>📱 LOCAL PLAY</b><span>1端末でHUMAN / CPUを進行。新しい選手個性・Campも適用。</span></button><button class=homeChoice onclick=openOnlineHub()><b>🌐 ONLINE PLAY</b><span>ROOM CODEで最大4人のHUMANが各端末から参加。</span></button></div></div>`}
+/* ---------- ONLINE setup: maximum 8 simultaneous HUMAN devices ---------- */
+function homeScreen(){return`<div class=panel><div class=stage>PLAY CALL SERIES</div><div class=title>FRANCHISE MODE</div><div class=desc>Ver.0.6.1：2〜8人ONLINE、同時ROSTER BUILD、同時カード選択GAME DAY、選手TYPE・新Training Camp・短期Playoff Formを搭載。</div><div class=homeGrid><button class=homeChoice onclick=startLocalSetup()><b>📱 LOCAL PLAY</b><span>1端末でHUMAN / CPUを進行。新しい選手個性・Campも適用。</span></button><button class=homeChoice onclick=openOnlineHub()><b>🌐 ONLINE PLAY</b><span>ROOM CODEで最大8人のHUMANが各端末から参加。</span></button></div></div>`}
 function setup(){return`<div class=panel><div class=stage>FRANCHISE MODE</div><div class=title>NEW FRANCHISE</div><p class=desc>4〜8チーム。HUMAN / CPUを自由に設定。Season数は3 / 5 / 7。選手TYPE（王道 / 晩成 / 即戦力 / 一発屋）がTraining Camp傾向に影響。Campは通常4＋HEADLINE1、Playoff Formは2人・Postseason限定。DRAFT → ROSTER BUILD → TRAINING CAMP → FINAL ROSTER → REGULAR SEASON → PLAYOFF FORM → PLAYOFFS。</p><div class=setupgrid><div class=slot><label class=desc>SEASONS</label><select id=sc>${[3,5,7].map(n=>`<option value="${n}" ${n===7?"selected":""}>${n} SEASONS</option>`).join("")}</select></div><div class=slot><label class=desc>チーム数</label><select id=pc onchange=inputs()>${[4,5,6,7,8].map(n=>`<option>${n}</option>`).join("")}</select></div></div><div id=inputs class=setupgrid></div><button class=big onclick=start()>FRANCHISE START</button></div>`}
-function onlineSetupScreen(){return`<div class=panel><div class=stage>ONLINE — NEW FRANCHISE</div><div class=title>ROOM SETUP</div><p class=desc>4〜8チーム。ONLINEのHUMANは<b>2〜4人</b>。残りはCPUにできます。HOSTは最初のHUMAN TEAMを担当します。DRAFTは順番制、ドラフト後ROSTER BUILDとGAME DAYのカード選択は同時進行対応。</p><div class=setupgrid><div class=slot><label class=desc>SEASONS</label><select id=osc>${[3,5,7].map(n=>`<option value="${n}" ${n===7?"selected":""}>${n} SEASONS</option>`).join("")}</select></div><div class=slot><label class=desc>チーム数</label><select id=opc onchange=onlineInputs()>${[4,5,6,7,8].map(n=>`<option>${n}</option>`).join("")}</select></div></div><div id=oinputs class=setupgrid></div><button class=big onclick=createOnlineRoom()>ROOMを作成</button><button class=ghost style="width:100%;margin-top:9px" onclick=openOnlineHub()>← BACK</button></div>`}
+function onlineSetupScreen(){return`<div class=panel><div class=stage>ONLINE — NEW FRANCHISE</div><div class=title>ROOM SETUP</div><p class=desc>4〜8チーム。ONLINEのHUMANは<b>2〜8人</b>。残りはCPUにできます。HOSTは最初のHUMAN TEAMを担当します。DRAFTは順番制、ドラフト後ROSTER BUILDとGAME DAYのカード選択は同時進行対応。</p><div class=setupgrid><div class=slot><label class=desc>SEASONS</label><select id=osc>${[3,5,7].map(n=>`<option value="${n}" ${n===7?"selected":""}>${n} SEASONS</option>`).join("")}</select></div><div class=slot><label class=desc>チーム数</label><select id=opc onchange=onlineInputs()>${[4,5,6,7,8].map(n=>`<option>${n}</option>`).join("")}</select></div></div><div id=oinputs class=setupgrid></div><button class=big onclick=createOnlineRoom()>ROOMを作成</button><button class=ghost style="width:100%;margin-top:9px" onclick=openOnlineHub()>← BACK</button></div>`}
 function onlineInputs(){let n=+(document.getElementById("opc")?.value||4),e=document.getElementById("oinputs");if(e)e.innerHTML=Array.from({length:n},(_,i)=>`<div class=slot><input id=op${i} value="${i===0?"PLAYER 1":i===1?"PLAYER 2":"CPU "+i}"><select id=ot${i} onchange="onlineRoleChanged(${i})"><option value=human ${i<2?"selected":""}>HUMAN</option><option value=cpu ${i>=2?"selected":""}>CPU</option></select></div>`).join("")}
-function onlineRoleChanged(i){let n=+(document.getElementById("opc")?.value||4),sel=document.getElementById("ot"+i),inp=document.getElementById("op"+i);if(!sel||!inp)return;let humans=0;for(let k=0;k<n;k++)if(document.getElementById("ot"+k)?.value==="human")humans++;if(humans>4){sel.value="cpu";alert("ONLINE同接HUMANは最大4人です。")}if(sel.value==="human"&&/^CPU \d+$/.test(inp.value.trim()))inp.value=`PLAYER ${i+1}`;if(sel.value==="cpu"&&/^PLAYER \d+$/.test(inp.value.trim()))inp.value=`CPU ${i}`}
+function onlineRoleChanged(i){let n=+(document.getElementById("opc")?.value||4),sel=document.getElementById("ot"+i),inp=document.getElementById("op"+i);if(!sel||!inp)return;let humans=0;for(let k=0;k<n;k++)if(document.getElementById("ot"+k)?.value==="human")humans++;if(humans>8){sel.value="cpu";alert("ONLINE同接HUMANは最大8人です。")}if(sel.value==="human"&&/^CPU \d+$/.test(inp.value.trim()))inp.value=`PLAYER ${i+1}`;if(sel.value==="cpu"&&/^PLAYER \d+$/.test(inp.value.trim()))inp.value=`CPU ${i}`}
 async function createOnlineRoom(){
  if(!dbReady())return alert("Database URLが未設定です。");
  let n=+document.getElementById("opc").value,maxSeason=+document.getElementById("osc").value,defs=Array.from({length:n},(_,i)=>({name:(document.getElementById("op"+i).value.trim()||`PLAYER ${i+1}`),cpu:document.getElementById("ot"+i).value==="cpu"})),humanCount=defs.filter(x=>!x.cpu).length;
  if(humanCount<2)return alert("ONLINE PLAYはHUMANを2人以上にしてください。");
- if(humanCount>4)return alert("Ver.0.6.0のONLINE同接HUMANは最大4人です。");
- let rc="";try{for(let i=0;i<8;i++){rc=roomCode6();if(!(await dbGet(`rooms/${rc}`)))break}S=fresh();S.room.mode="online";S.room.id=rc;S.room.phase="online_lobby";S.room.maxSeason=maxSeason;S.players=defs.map((d,i)=>pl(i,d.name,d.cpu));let first=S.players.find(p=>!p.cpu);NET.roomCode=rc;NET.localPlayerId=first.id;NET.isHost=true;NET.connected=true;NET.members={[NET.deviceId]:{playerId:first.id,name:first.name,host:true,joinedAt:Date.now()}};NET.gameChoices={};netSave();S.room.syncRev=1;S.room.syncAt=Date.now();await dbPut(`rooms/${rc}`,{meta:{version:VERSION,hostDevice:NET.deviceId,createdAt:Date.now(),updatedAt:Date.now(),maxHumans:4},state:S,members:NET.members});saveLocal();startStreams();render();topNow()}catch(e){NET.connected=false;alert(`ROOM作成に失敗しました。\n${e.message}`)}
+ if(humanCount>8)return alert("Ver.0.6.1のONLINE同接HUMANは最大8人です。");
+ let rc="";try{for(let i=0;i<8;i++){rc=roomCode6();if(!(await dbGet(`rooms/${rc}`)))break}S=fresh();S.room.mode="online";S.room.id=rc;S.room.phase="online_lobby";S.room.maxSeason=maxSeason;S.players=defs.map((d,i)=>pl(i,d.name,d.cpu));let first=S.players.find(p=>!p.cpu);NET.roomCode=rc;NET.localPlayerId=first.id;NET.isHost=true;NET.connected=true;NET.members={[NET.deviceId]:{playerId:first.id,name:first.name,host:true,joinedAt:Date.now()}};NET.gameChoices={};netSave();S.room.syncRev=1;S.room.syncAt=Date.now();await dbPut(`rooms/${rc}`,{meta:{version:VERSION,hostDevice:NET.deviceId,createdAt:Date.now(),updatedAt:Date.now(),maxHumans:8},state:S,members:NET.members});saveLocal();startStreams();render();topNow()}catch(e){NET.connected=false;alert(`ROOM作成に失敗しました。\n${e.message}`)}
 }
-function onlineLobbyScreen(){let humans=S.players.filter(p=>!p.cpu),claimed=humans.filter(p=>memberForPlayer(p.id)).length,all=claimed===humans.length;return`<div class=panel><div class=stage>ONLINE LOBBY — ${claimed}/${humans.length} HUMAN CONNECTED</div><div class=title>ROOM CODE</div><div class=roomCode>${esc(NET.roomCode)}</div><div class=notice>最大4人のHUMAN端末が参加できます。コードを友達に共有し、各自が自分のHUMAN TEAMをSELECTしてください。</div><div class=onlineTeams>${S.players.map(p=>{if(p.cpu)return`<div class=onlineTeam><div><b>${esc(p.name)}</b><div class=type>CPU GM</div></div><span>🤖 CPU</span></div>`;let ent=memberForPlayer(p.id),dev=ent?.[0],m=ent?.[1],mine=NET.localPlayerId===p.id;return`<div class=onlineTeam><div><b>${esc(p.name)} ${mine?"— YOU":""}</b><div class=type>HUMAN</div></div>${m?`<div><span class=claimed>CONNECTED${m.host?" / HOST":""}</span>${NET.isHost&&!m.host?`<br><button class=miniBtn onclick="releaseOnlineTeam('${dev}')">RELEASE</button>`:""}</div>`:(NET.localPlayerId===null?`<button class=miniBtn onclick=claimOnlineTeam(${p.id})>SELECT</button>`:`<span class=open>WAITING</span>`)}</div>`}).join("")}</div>${NET.isHost?`<button class=big ${all?"":"disabled"} onclick=startOnlineFranchise()>${all?"ALL PLAYERS READY — START":"HUMAN参加待ち"}</button>`:`<div class=notice>${NET.localPlayerId===null?"空いているHUMAN TEAMを選択してください。":all?"全員参加済み。HOSTのSTARTを待っています。":"他のHUMAN PLAYERの参加を待っています。"}</div>`}<button class=ghost style="width:100%;margin-top:9px" onclick=leaveOnlineRoom()>ROOMから退出</button></div>`}
+function onlineLobbyScreen(){let humans=S.players.filter(p=>!p.cpu),claimed=humans.filter(p=>memberForPlayer(p.id)).length,all=claimed===humans.length;return`<div class=panel><div class=stage>ONLINE LOBBY — ${claimed}/${humans.length} HUMAN CONNECTED</div><div class=title>ROOM CODE</div><div class=roomCode>${esc(NET.roomCode)}</div><div class=notice>最大8人のHUMAN端末が参加できます。コードを友達に共有し、各自が自分のHUMAN TEAMをSELECTしてください。</div><div class=onlineTeams>${S.players.map(p=>{if(p.cpu)return`<div class=onlineTeam><div><b>${esc(p.name)}</b><div class=type>CPU GM</div></div><span>🤖 CPU</span></div>`;let ent=memberForPlayer(p.id),dev=ent?.[0],m=ent?.[1],mine=NET.localPlayerId===p.id;return`<div class=onlineTeam><div><b>${esc(p.name)} ${mine?"— YOU":""}</b><div class=type>HUMAN</div></div>${m?`<div><span class=claimed>CONNECTED${m.host?" / HOST":""}</span>${NET.isHost&&!m.host?`<br><button class=miniBtn onclick="releaseOnlineTeam('${dev}')">RELEASE</button>`:""}</div>`:(NET.localPlayerId===null?`<button class=miniBtn onclick=claimOnlineTeam(${p.id})>SELECT</button>`:`<span class=open>WAITING</span>`)}</div>`}).join("")}</div>${NET.isHost?`<button class=big ${all?"":"disabled"} onclick=startOnlineFranchise()>${all?"ALL PLAYERS READY — START":"HUMAN参加待ち"}</button>`:`<div class=notice>${NET.localPlayerId===null?"空いているHUMAN TEAMを選択してください。":all?"全員参加済み。HOSTのSTARTを待っています。":"他のHUMAN PLAYERの参加を待っています。"}</div>`}<button class=ghost style="width:100%;margin-top:9px" onclick=leaveOnlineRoom()>ROOMから退出</button></div>`}
 
 /* ---------- Simultaneous ONLINE GAME DAY card selection ---------- */
 let GAME_CHOICE_QUEUE=Promise.resolve(),ONLINE_GD_RESOLVING=false;
@@ -1420,7 +1422,7 @@ function render(){
   else if(S.room.phase==="playoff_reorg")html=playoffReorgOnlineScreen();
   else if(S.room.phase==="playoffs"){html=playoffScreen();let pg=pendingCpuPlayoff();if(pg&&hostCanCpu())cpuLater(()=>simLeagueGame("playoff",pg.id),420)}
   else if(S.room.phase==="season_end"){html=seasonEnd();if(isOnline()&&!NET.isHost)html=disableExactAction(html,"advance")}
-  else html=`<div class=panel><div class=seasoncard><div class=stage>VER.0.6.0 COMPLETE</div><div class=title>${S.room.maxSeason} SEASONS COMPLETE</div><div class=notice>最終ロスターはROSTERS、全Seasonの順位推移・Regular Season・Playoff ChampionはRESULTSから確認できます。</div><button class=ghost style="width:100%;margin-top:10px" onclick=goHome()>HOME</button></div></div>`;
+  else html=`<div class=panel><div class=seasoncard><div class=stage>VER.0.6.1 COMPLETE</div><div class=title>${S.room.maxSeason} SEASONS COMPLETE</div><div class=notice>最終ロスターはROSTERS、全Seasonの順位推移・Regular Season・Playoff ChampionはRESULTSから確認できます。</div><button class=ghost style="width:100%;margin-top:10px" onclick=goHome()>HOME</button></div></div>`;
   g.innerHTML=(isOnline()?networkBar():"")+html;
  }catch(e){
   console.error("RENDER ERROR",e);
